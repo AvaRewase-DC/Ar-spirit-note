@@ -1,0 +1,76 @@
+services:
+  app:
+    build:
+      args:
+        user: daily-reads
+        uid: 1500
+      context: ./docker/php
+      dockerfile: Dockerfile
+    container_name: daily-reads
+    restart: unless-stopped
+    working_dir: /var/www/daily-reads
+    volumes:
+      - ./:/var/www/daily-reads
+      - ./docker/php/custom.ini:/usr/local/etc/php/conf.d/custom.ini
+    ports:
+      - 1500:9000
+    networks:
+      - daily-reads
+      - external_db_network
+    depends_on:
+      - db
+
+  # nginx:
+  #   container_name: reservation-test-nginx
+  #   restart: unless-stopped
+  #   image: nginx
+  #   ports:
+  #     - 1500:80
+  #   depends_on:
+  #     - app
+  #   volumes:
+  #     - ./:/var/www/daily-reads
+  #     - ./docker/nginx/conf.d/:/etc/nginx/conf.d
+  #   networks:
+  #     - daily-reads
+  db:
+    image: mariadb:10.5
+    container_name: reservation-test-db
+    restart: unless-stopped
+    command: --max_allowed_packet=67108864
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_USER: ${DB_USERNAME}
+    volumes:
+      - mysql-data:/var/lib/mysql
+    ports:
+      - "1501:3306"
+    networks:
+      - daily-reads
+      - external_db_network
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: daily-reads-db
+    restart: unless-stopped
+    environment:
+      PMA_HOST: db  # Points to the db service
+      PMA_PORT: 3306
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      UPLOAD_LIMIT: 256M
+    ports:
+      - "1502:80"
+    networks:
+      - daily-reads
+
+networks:
+  daily-reads:
+    driver: bridge
+  external_db_network:
+    external: false
+
+volumes:
+  mysql-data:
+    driver: local
