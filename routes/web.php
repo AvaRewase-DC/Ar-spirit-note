@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('daily-read.index');
+    return to_route('daily-read.index');
 });
 
 Route::group(['prefix' => 'daily-reads'], function () {

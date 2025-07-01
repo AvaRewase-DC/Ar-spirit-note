@@ -1,5 +1,6 @@
 @php
     use Carbon\Carbon;
+
     $day = Carbon::parse($reads->first()?->day);
     $year = $day->year ?? now()->year;
     $month = $day->month ?? now()->month;
@@ -31,39 +32,49 @@
 
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
-
 <head>
     <meta charset="UTF-8">
-    <title> شهر {{ $monthsArabic[$month] }} {{ $year }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>شهر {{ $monthsArabic[$month] }} {{ $year }}</title>
     <style>
         body {
             font-family: 'Tahoma', sans-serif;
             direction: rtl;
             text-align: center;
             background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            font-size: 1.5em;
+            padding: 10px;
         }
 
         table {
-            margin: 30px auto;
-            border-collapse: collapse;
-            width: 90%;
+            width: 100%;
             max-width: 700px;
+            margin: 20px auto;
+            border-collapse: collapse;
             background: #fff;
+            table-layout: fixed;
         }
 
         th,
         td {
             border: 1px solid #ccc;
-            padding: 15px;
-            min-height: 80px; /* ارتفاع مرن */
+            padding: 10px;
+            min-height: 60px;
             vertical-align: top;
-            word-wrap: break-word;     /* التفاف النص */
-            white-space: normal;        /* السماح بالتفاف الأسطر */
-            overflow-wrap: break-word; /* دعم أفضل للتفاف النص */
+            word-wrap: break-word;
+            white-space: normal;
+            overflow-wrap: break-word;
+            font-size: 0.8em;
         }
 
         th {
-            background-color: #f0f0f0;
+            background-color: yellow;
+            font-size: 0.9em;
         }
 
         td {
@@ -72,6 +83,7 @@
 
         .date-number {
             font-weight: bold;
+            font-size: 0.75em;
         }
 
         hr {
@@ -79,12 +91,22 @@
             border: none;
             border-top: 1px solid #ccc;
         }
+
+        @media (max-width: 600px) {
+            th, td {
+                padding: 8px;
+                font-size: 0.7em;
+            }
+
+            .date-number {
+                font-size: 0.7em;
+            }
+        }
     </style>
 </head>
 
 <body>
-
-    <h1>تقويم شهر {{ $monthsArabic[$month] }} {{ $year }}</h1>
+    <h1>شهر {{ $monthsArabic[$month] }} {{ $year }}</h1>
 
     <table>
         <thead>
@@ -94,7 +116,6 @@
                 @endforeach
             </tr>
         </thead>
-
         <tbody>
             @for ($week = 0; $week < $weeks; $week++)
                 <tr>
@@ -120,7 +141,5 @@
             @endfor
         </tbody>
     </table>
-
 </body>
-
 </html>
