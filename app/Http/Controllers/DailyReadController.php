@@ -43,8 +43,8 @@ class DailyReadController extends Controller
 
     public function store(CreateDailyReadRequest $request)
     {
-        $this->dailyReadRepository->store($request);
+        $this->dailyReadRepository->store($request->validated());
 
-        return redirect()->back()->with('message', 'Daily read created successfully');
+        return redirect()->back()->with('success', 'Daily read created successfully');
     }
 }

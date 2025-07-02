@@ -87,6 +87,13 @@
                 </ul>
             </div>
         @endif
+        @if (session('success'))
+            <div
+                style="background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                {{ session('success') }}
+            </div>
+        @endif
+
 
         <form action="{{ route('daily-read.store') }}" method="POST">
             @csrf
@@ -131,6 +138,18 @@
             container.appendChild(input);
         }
     </script>
+    <script>
+        document.querySelector('form').addEventListener('submit', function(e) {
+            // Remove empty textareas and inputs (except required ones like date)
+            const inputs = this.querySelectorAll('input[type="url"], textarea');
+            inputs.forEach(input => {
+                if (!input.required && !input.value.trim()) {
+                    input.remove();
+                }
+            });
+        });
+    </script>
+
 </body>
 
 </html>

@@ -13,17 +13,19 @@ class DailyReadRepository
     {
         $new = $this->model->create([
             'day' => $input['day'],
-            'description' => $input['description'],
-            'katamars' => $input['katamars'],
+            'description' => $input['description'] ?? null,
+            'katamars' => $input['katamars'] ?? null,
             'read_parts' => $input['read_parts'],
-            'bible' => $input['bible'],
-            'quiz' => $input['quiz'],
+            'bible' => $input['bible'] ?? null,
+            'quiz' => $input['quiz'] ?? null,
         ]);
-        foreach ($input['videos'] as $video) {
-            DailyReadVideo::create([
-                'daily_read_id' => $new->id,
-                'video' => $video,
-            ]);
+        if (! empty($input['videos'])) {
+            foreach ($input['videos'] as $video) {
+                DailyReadVideo::create([
+                    'daily_read_id' => $new->id,
+                    'video' => $video,
+                ]);
+            }
         }
 
         return $new;
