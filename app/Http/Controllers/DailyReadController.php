@@ -24,4 +24,11 @@ class DailyReadController extends Controller
 
         return view('daily-read.index', compact('reads'));
     }
+
+    public function show(Request $request)
+    {
+        $read = DailyRead::whereDate('day', '=', $request->date ?? today())->first();
+
+        return view('daily-read.show', compact('read'));
+    }
 }
