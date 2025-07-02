@@ -31,7 +31,10 @@
                         @endphp
                         <td>
                             <a href="{{ route('daily-read.show', ['date' => $currentDate]) }}" style="text-decoration: none; color: inherit; display: block;">
-                                <div class="date-number">{{ $dayCounter }}</div>
+                                <div class="date-number">{{ $dayCounter }}   @if (isset($reads[$dayCounter - 1]))
+                                <br> {{$reads[$dayCounter - 1]->getCopticDate() }}
+                                @endif
+                                 </div>
                                 <hr>
                                 @if (isset($reads[$dayCounter - 1]))
                                     {{ $reads[$dayCounter - 1]?->read_parts }}
