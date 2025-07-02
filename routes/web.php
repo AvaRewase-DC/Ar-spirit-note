@@ -21,6 +21,7 @@ Route::get('/', function () {
 Route::group(['prefix' => 'daily-reads'], function () {
     Route::get('/', [DailyReadController::class, 'index'])->name('daily-read.index');
     Route::get('/show', [DailyReadController::class, 'show'])->name('daily-read.show');
+    Route::get('/today', [DailyReadController::class, 'show'])->name('daily-read.today');
     Route::get('/create', [DailyReadController::class, 'create'])->name('daily-read.create');
     Route::post('/store', [DailyReadController::class, 'store'])->name('daily-read.store');
 });
