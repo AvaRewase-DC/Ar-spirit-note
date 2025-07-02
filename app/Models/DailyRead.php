@@ -15,6 +15,11 @@ class DailyRead extends Model
         'day',
     ];
 
+    public function videos()
+    {
+        return $this->hasMany(DailyReadVideo::class);
+    }
+
     public function getCopticDate(): string
     {
         $date = Carbon::parse($this->day ?? today());
