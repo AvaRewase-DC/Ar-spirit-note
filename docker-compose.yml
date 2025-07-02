@@ -33,6 +33,7 @@ services:
   #     - ./docker/nginx/conf.d/:/etc/nginx/conf.d
   #   networks:
   #     - daily-reads
+
   db:
     image: mariadb:10.5
     container_name: reservation-test-db

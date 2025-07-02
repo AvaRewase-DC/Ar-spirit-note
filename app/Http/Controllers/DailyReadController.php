@@ -4,16 +4,23 @@ namespace App\Http\Controllers;
 
 use App\Models\DailyRead;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 
 class DailyReadController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $startOfMonth = Carbon::create(now()->year, now()->month, 1)->startOfDay();
-        $endOfMonth = Carbon::create(now()->year, now()->month, 1)->endOfMonth()->endOfDay();
+        $year = $request->year ?? now()->year;
+        $month = $request->month ?? now()->month;
+        $startOfMonth = Carbon::create($year, $month, 1)->startOfDay();
+        $endOfMonth = Carbon::create($year, $month, 1)->endOfMonth()->endOfDay();
         $reads = DailyRead::whereDate('day', '>=', $startOfMonth)
             ->whereDate('day', '<=', $endOfMonth)
             ->get();
+
+        if ($request->ajax()) {
+            return view('daily-read.partial-table', compact('reads', 'year', 'month'))->render();
+        }
 
         return view('daily-read.index', compact('reads'));
     }
