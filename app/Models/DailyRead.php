@@ -17,7 +17,7 @@ class DailyRead extends Model
 
     public function getCopticDate(): string
     {
-        $date = Carbon::parse($this->day);
+        $date = Carbon::parse($this->day ?? today());
         $copticMonthsArabic = [
             1 => 'توت', 2 => 'بابه', 3 => 'هاتور', 4 => 'كيهك',
             5 => 'طوبه', 6 => 'أمشير', 7 => 'برمهات', 8 => 'برموده',
