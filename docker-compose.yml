@@ -1,16 +1,16 @@
 services:
   app:
     build:
+      context: ./docker/php
+      dockerfile: Dockerfile
       args:
         user: daily-reads
         uid: 1500
-      context: ./docker/php
-      dockerfile: Dockerfile
     container_name: daily-reads
     restart: unless-stopped
-    working_dir: /var/www/daily-reads
+    working_dir: /var/www/Ar-spirit-note
     volumes:
-      - ./:/var/www/daily-reads
+      - ./:/var/www/Ar-spirit-note
       - ./docker/php/custom.ini:/usr/local/etc/php/conf.d/custom.ini
     ports:
       - 1500:9000
@@ -36,7 +36,7 @@ services:
 
   db:
     image: mariadb:10.5
-    container_name: reservation-test-db
+    container_name: daily-reads-db
     restart: unless-stopped
     command: --max_allowed_packet=67108864
     environment:
@@ -54,15 +54,17 @@ services:
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
-    container_name: daily-reads-db
+    container_name: daily-reads-phpmyadmin
     restart: unless-stopped
     environment:
-      PMA_HOST: db  # Points to the db service
+      PMA_HOST: db
       PMA_PORT: 3306
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
       UPLOAD_LIMIT: 256M
     ports:
       - "1502:80"
+    depends_on:
+      - db
     networks:
       - daily-reads
 
@@ -70,6 +72,7 @@ networks:
   daily-reads:
     driver: bridge
   external_db_network:
+    # If you want to use an existing network, set external: true and create it externally
     external: false
 
 volumes:
