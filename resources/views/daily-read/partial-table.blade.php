@@ -22,19 +22,21 @@
             <tr>
                 @for ($i = 0; $i < 7; $i++)
                     @if ($dayCounter === 1 && $i < $startDayOfWeek)
-                        {{-- Before the 1st of the month, add empty cells --}}
                         <td></td>
                     @elseif ($dayCounter > $daysInMonth)
-                        {{-- After the last day of the month, add empty cells --}}
                         <td></td>
                     @else
-                        {{-- Fill in valid days --}}
+                        @php
+                            $currentDate = Carbon::create($year, $month, $dayCounter)->toDateString();
+                        @endphp
                         <td>
-                            <div class="date-number">{{ $dayCounter }}</div>
-                            <hr>
-                            @if (isset($reads[$dayCounter - 1]))
-                                {{ $reads[$dayCounter - 1]?->read_parts }}
-                            @endif
+                            <a href="{{ route('daily-read.show', ['date' => $currentDate]) }}" style="text-decoration: none; color: inherit; display: block;">
+                                <div class="date-number">{{ $dayCounter }}</div>
+                                <hr>
+                                @if (isset($reads[$dayCounter - 1]))
+                                    {{ $reads[$dayCounter - 1]?->read_parts }}
+                                @endif
+                            </a>
                         </td>
                         @php $dayCounter++; @endphp
                     @endif

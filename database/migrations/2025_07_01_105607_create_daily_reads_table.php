@@ -15,6 +15,10 @@ return new class extends Migration
             $table->id();
             $table->string('read_parts');
             $table->date('day');
+            $table->string('description')->nullable();
+            $table->longText('bible')->nullable();
+            $table->string('quiz')->nullable();
+            $table->longText('katamars')->nullable();
             $table->timestamps();
         });
     }
