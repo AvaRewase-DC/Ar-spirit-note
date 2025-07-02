@@ -13,11 +13,20 @@ class DailyRead extends Model
     protected $fillable = [
         'read_parts',
         'day',
+        'katamars',
+        'bible',
+        'quiz',
+
     ];
 
     public function videos()
     {
         return $this->hasMany(DailyReadVideo::class);
+    }
+
+    public function dailyVideos()
+    {
+        return $this->belongsToMany(DailyReadVideo::class);
     }
 
     public function getCopticDate(): string
