@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CreateDailyReadRequest;
 use App\Models\DailyRead;
 use App\Repositories\DailyReadRepository;
 use Carbon\Carbon;
@@ -40,7 +41,7 @@ class DailyReadController extends Controller
         return view('daily-read.create');
     }
 
-    public function store(Request $request)
+    public function store(CreateDailyReadRequest $request)
     {
         $this->dailyReadRepository->store($request);
 

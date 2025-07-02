@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
+
 <head>
     <meta charset="UTF-8">
     <title>إنشاء قراءة يومية</title>
@@ -70,9 +71,22 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
+
         <h2>إنشاء قراءة يومية جديدة</h2>
+        @if ($errors->any())
+            <div
+                style="background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                <strong>حدثت أخطاء:</strong>
+                <ul style="margin: 10px 0 0 0; padding-right: 20px;">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
 
         <form action="{{ route('daily-read.store') }}" method="POST">
             @csrf
@@ -118,4 +132,5 @@
         }
     </script>
 </body>
+
 </html>
