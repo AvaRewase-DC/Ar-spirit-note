@@ -20,10 +20,10 @@ Route::get('/', function () {
 
 Route::group(['prefix' => 'daily-reads'], function () {
     Route::get('/', [DailyReadController::class, 'index'])->name('daily-read.index');
-    Route::get('/{date}', [DailyReadController::class, 'show'])->name('daily-read.show');
     Route::get('/today', [DailyReadController::class, 'show'])->name('daily-read.today');
     Route::get('/create', [DailyReadController::class, 'create'])->name('daily-read.create');
     Route::get('/edit/{id}', [DailyReadController::class, 'edit'])->name('daily-read.edit');
     Route::put('/update/{id}', [DailyReadController::class, 'update'])->name('daily-read.update');
     Route::post('/store', [DailyReadController::class, 'store'])->name('daily-read.store');
+    Route::get('/{date}', [DailyReadController::class, 'show'])->name('daily-read.show');
 });
