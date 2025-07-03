@@ -147,10 +147,11 @@
                     <h2>تفاسير</h2>
                     @foreach ($read->videos as $video)
                         @php
-                            $url = is_object($video) ? ($video->video ?? '#') : ($video ?? '#');
+                            $url = is_object($video) ? $video->video ?? '#' : $video ?? '#';
                         @endphp
                         @if ($url && $url !== '#')
-                            <p><a href="#" class="video-popup" data-url="{{ $url }}">مشاهدة الفيديو</a></p>
+                            <p><a href="#" class="video-popup" data-url="{{ $url }}">مشاهدة الفيديو</a>
+                            </p>
                         @endif
                     @endforeach
                 </div>
@@ -192,7 +193,8 @@
     <div id="videoModal"
         style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
            background:rgba(0,0,0,0.7); justify-content:center; align-items:center; z-index:9999;">
-        <div style="position:relative; width:90%; max-width:800px; background:#000; border-radius:8px; overflow:hidden;">
+        <div
+            style="position:relative; width:90%; max-width:800px; background:#000; border-radius:8px; overflow:hidden;">
             <iframe id="iframePlayer" style="display:none;" width="100%" height="450" frameborder="0"
                 allowfullscreen allow="autoplay"></iframe>
             <video id="videoPlayer" style="display:none; width:100%; height:auto;" controls></video>
@@ -283,8 +285,8 @@
 
             if (inBottomRight) {
                 clickCount++;
-                if (clickCount >= 3) {
-                    window.location.href = "{{ route('daily-read.edit', $read?->id) }}";
+                if (clickCount >= 3 && $read) {
+                    window.location.href = "{{ $read ? route('daily-read.edit', $read->id) : '#' }}";
                 }
                 clearTimeout(clickTimer);
                 clickTimer = setTimeout(() => clickCount = 0, 2000);
