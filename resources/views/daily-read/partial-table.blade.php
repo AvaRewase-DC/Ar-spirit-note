@@ -30,13 +30,14 @@
                             $currentDate = Carbon::create($year, $month, $dayCounter)->toDateString();
                         @endphp
                         <td>
-                            <a href="{{ route('daily-read.show', ['date' => $currentDate]) }}" style="text-decoration: none; color: inherit; display: block;">
-                                <div class="date-number">{{ $dayCounter }}   @if (isset($reads[$dayCounter - 1]) &&  Carbon::parse($reads[$dayCounter - 1]->day)->day == $dayCounter )
-                                <br> {{$reads[$dayCounter - 1]->getCopticDate() }}
-                                @endif
-                                 </div>
+                            <a href="{{ route('daily-read.show', ['date' => $currentDate]) }}"
+                                style="text-decoration: none; color: inherit; display: block;">
+                                <div class="date-number">{{ $dayCounter }} @if (isset($reads[$dayCounter - 1]) && Carbon::parse($reads[$dayCounter - 1]->day)->day == $dayCounter)
+                                        <br> {{ $reads[$dayCounter - 1]->getCopticDate() }}
+                                    @endif
+                                </div>
                                 <hr>
-                                @if (isset($reads[$dayCounter - 1]) &&  Carbon::parse($reads[$dayCounter - 1]->day)->day == $dayCounter )
+                                @if (isset($reads[$dayCounter - 1]) && Carbon::parse($reads[$dayCounter - 1]->day)->day == $dayCounter)
                                     {{ $reads[$dayCounter - 1]?->read_parts }}
                                 @endif
                             </a>

@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\CreateDailyReadRequest;
-use App\Models\DailyRead;
+use App\Http\Requests\ShowDailyReadRequest;
+use App\Http\Requests\UpdateDailyReadRequest;
 use App\Repositories\DailyReadRepository;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class DailyReadController extends Controller
@@ -14,24 +14,29 @@ class DailyReadController extends Controller
 
     public function index(Request $request)
     {
-        $year = $request->year ?? now()->year;
-        $month = $request->month ?? now()->month;
-        $startOfMonth = Carbon::create($year, $month, 1)->startOfDay();
-        $endOfMonth = Carbon::create($year, $month, 1)->endOfMonth()->endOfDay();
-        $reads = DailyRead::whereDate('day', '>=', $startOfMonth)
-            ->whereDate('day', '<=', $endOfMonth)
-            ->get();
+        $year = $request->input('year', now()->year);
+        $month = $request->input('month', now()->month);
+
+        validator([
+            'year' => $year,
+            'month' => $month,
+        ], [
+            'year' => 'required|integer|in:2025,2026',
+            'month' => 'required|integer|between:1,12',
+        ])->validate();
+
+        $reads = $this->dailyReadRepository->index($year, $month);
 
         if ($request->ajax()) {
             return view('daily-read.partial-table', compact('reads', 'year', 'month'))->render();
         }
 
-        return view('daily-read.index', compact('reads'));
+        return view('daily-read.index', compact('reads', 'year', 'month'));
     }
 
-    public function show(Request $request)
+    public function show(ShowDailyReadRequest $request)
     {
-        $read = DailyRead::whereDate('day', '=', $request->date ?? today())->first();
+        $read = $this->dailyReadRepository->show($request->date);
 
         return view('daily-read.show', compact('read'));
     }
@@ -46,5 +51,31 @@ class DailyReadController extends Controller
         $this->dailyReadRepository->store($request->validated());
 
         return redirect()->back()->with('success', 'Daily read created successfully');
+    }
+
+    public function edit($id)
+    {
+        $read = $this->dailyReadRepository->edit($id);
+
+        return view('daily-read.edit', compact('read'));
+    }
+
+    public function update(UpdateDailyReadRequest $request, $id)
+    {
+        // $validated = $request->validate([
+        //     'day'         => ['required', 'date'],
+        //     'description' => ['nullable', 'string'],
+        //     'katamars'    => ['nullable', 'url'],
+        //     'read_parts'  => ['required', 'string'],
+        //     'bible'       => ['nullable', 'string'],
+        //     'quiz'        => ['nullable', 'url'],
+        //     'videos'      => ['nullable', 'array'],
+        //     'videos.*'    => ['required', 'url'],
+        // ]);
+        $read = $this->dailyReadRepository->update($request, $id);
+
+        return redirect()
+            ->route('daily-read.show', $read->day)
+            ->with('success', 'تم تحديث القراءة اليومية بنجاح.');
     }
 }

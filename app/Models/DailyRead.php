@@ -13,10 +13,10 @@ class DailyRead extends Model
     protected $fillable = [
         'read_parts',
         'day',
+        'description',
         'katamars',
         'bible',
         'quiz',
-
     ];
 
     public function videos()
