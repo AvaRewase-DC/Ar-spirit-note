@@ -141,19 +141,20 @@
                     <p>{{ $read->read_parts }}</p>
                 </div>
             @endif
+
             @if (!empty($read->videos))
                 <div class="part">
                     <h2>تفاسير</h2>
                     @foreach ($read->videos as $video)
-                        @php $url = $video ? $video->video ?? '#' : $video; @endphp
-                        <p>
-                            <a href="#" class="video-popup" data-url="{{ $url }}">مشاهدة الفيديو</a>
-                        </p>
+                        @php
+                            $url = is_object($video) ? ($video->video ?? '#') : ($video ?? '#');
+                        @endphp
+                        @if ($url && $url !== '#')
+                            <p><a href="#" class="video-popup" data-url="{{ $url }}">مشاهدة الفيديو</a></p>
+                        @endif
                     @endforeach
-
                 </div>
             @endif
-
 
             <div class="part">
                 <h2>الكتاب المقدس</h2>
@@ -186,97 +187,112 @@
             العودة إلى التقويم
         </a>
     </div>
-    <!-- Video Modal (supports iframe and <video>) -->
+
+    <!-- Video Modal -->
     <div id="videoModal"
         style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
            background:rgba(0,0,0,0.7); justify-content:center; align-items:center; z-index:9999;">
-        <div
-            style="position:relative; width:90%; max-width:800px; background:#000; border-radius:8px; overflow:hidden;">
-            <!-- For iframe embeds (YouTube, Vimeo, etc.) -->
+        <div style="position:relative; width:90%; max-width:800px; background:#000; border-radius:8px; overflow:hidden;">
             <iframe id="iframePlayer" style="display:none;" width="100%" height="450" frameborder="0"
                 allowfullscreen allow="autoplay"></iframe>
-
-            <!-- For direct video files -->
             <video id="videoPlayer" style="display:none; width:100%; height:auto;" controls></video>
-
             <button onclick="closeVideoModal()"
                 style="position:absolute; top:-10px; right:-10px; background:red; color:white;
                    border:none; border-radius:50%; width:30px; height:30px; font-size:18px; cursor:pointer;">×</button>
         </div>
     </div>
 
-
-</body>
-<script>
-    document.querySelectorAll('.video-popup').forEach(link => {
-        link.addEventListener('click', function(e) {
-            e.preventDefault();
-            const url = this.getAttribute('data-url');
-            openVideoModal(url);
+    <script>
+        // Video logic
+        document.querySelectorAll('.video-popup').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const url = this.getAttribute('data-url');
+                openVideoModal(url);
+            });
         });
-    });
 
-    function openVideoModal(url) {
-        const iframe = document.getElementById('iframePlayer');
-        const video = document.getElementById('videoPlayer');
-        const modal = document.getElementById('videoModal');
+        function openVideoModal(url) {
+            const iframe = document.getElementById('iframePlayer');
+            const video = document.getElementById('videoPlayer');
+            const modal = document.getElementById('videoModal');
 
-        iframe.style.display = 'none';
-        video.style.display = 'none';
-        iframe.src = '';
-        video.src = '';
+            iframe.style.display = 'none';
+            video.style.display = 'none';
+            iframe.src = '';
+            video.src = '';
 
-        if (isDirectVideo(url)) {
-            video.src = url;
-            video.style.display = 'block';
-        } else if (isYouTube(url)) {
-            const embedUrl = convertYouTubeEmbed(url);
-            iframe.src = embedUrl;
-            iframe.style.display = 'block';
-        } else if (isVimeo(url)) {
-            const embedUrl = convertVimeoEmbed(url);
-            iframe.src = embedUrl;
-            iframe.style.display = 'block';
-        } else {
-            // Fallback: open in new tab
-            window.open(url, '_blank');
-            return;
+            if (isDirectVideo(url)) {
+                video.src = url;
+                video.style.display = 'block';
+            } else if (isYouTube(url)) {
+                iframe.src = convertYouTubeEmbed(url);
+                iframe.style.display = 'block';
+            } else if (isVimeo(url)) {
+                iframe.src = convertVimeoEmbed(url);
+                iframe.style.display = 'block';
+            } else {
+                window.open(url, '_blank');
+                return;
+            }
+
+            modal.style.display = 'flex';
         }
 
-        modal.style.display = 'flex';
-    }
+        function closeVideoModal() {
+            document.getElementById('iframePlayer').src = '';
+            document.getElementById('videoPlayer').pause();
+            document.getElementById('videoPlayer').src = '';
+            document.getElementById('videoModal').style.display = 'none';
+        }
 
-    function closeVideoModal() {
-        document.getElementById('iframePlayer').src = '';
-        document.getElementById('videoPlayer').pause();
-        document.getElementById('videoPlayer').src = '';
-        document.getElementById('videoModal').style.display = 'none';
-    }
+        function isDirectVideo(url) {
+            return /\.(mp4|webm|ogg)$/i.test(url);
+        }
 
-    function isDirectVideo(url) {
-        return /\.(mp4|webm|ogg)$/i.test(url);
-    }
+        function isYouTube(url) {
+            return /youtu\.?be/.test(url);
+        }
 
-    function isYouTube(url) {
-        return /youtu\.?be/.test(url);
-    }
+        function isVimeo(url) {
+            return /vimeo\.com/.test(url);
+        }
 
-    function isVimeo(url) {
-        return /vimeo\.com/.test(url);
-    }
+        function convertYouTubeEmbed(url) {
+            const match = url.match(/(?:v=|\/)([0-9A-Za-z_-]{11})/);
+            const videoId = match ? match[1] : null;
+            return videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1` : url;
+        }
 
-    function convertYouTubeEmbed(url) {
-        const match = url.match(/(?:v=|\/)([0-9A-Za-z_-]{11})/);
-        const videoId = match ? match[1] : null;
-        return videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1` : url;
-    }
+        function convertVimeoEmbed(url) {
+            const match = url.match(/vimeo\.com\/(\d+)/);
+            const videoId = match ? match[1] : null;
+            return videoId ? `https://player.vimeo.com/video/${videoId}?autoplay=1` : url;
+        }
 
-    function convertVimeoEmbed(url) {
-        const match = url.match(/vimeo\.com\/(\d+)/);
-        const videoId = match ? match[1] : null;
-        return videoId ? `https://player.vimeo.com/video/${videoId}?autoplay=1` : url;
-    }
-</script>
+        // 👇 Triple-click in bottom-right to open edit
+        let clickCount = 0;
+        let clickTimer;
+        document.addEventListener('click', function(e) {
+            const x = e.clientX;
+            const y = e.clientY;
+            const w = window.innerWidth;
+            const h = window.innerHeight;
 
+            const inBottomRight = x > (w - 100) && y > (h - 100);
+
+            if (inBottomRight) {
+                clickCount++;
+                if (clickCount >= 3) {
+                    window.location.href = "{{ route('daily-read.edit', $read?->id) }}";
+                }
+                clearTimeout(clickTimer);
+                clickTimer = setTimeout(() => clickCount = 0, 2000);
+            } else {
+                clickCount = 0;
+            }
+        });
+    </script>
+</body>
 
 </html>
