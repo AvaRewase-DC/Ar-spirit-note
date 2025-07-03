@@ -159,8 +159,13 @@
 
             <div class="part">
                 <h2>الكتاب المقدس</h2>
-                <p>{{ $read->bible ?? 'لا يوجد كتاب مقدس.' }}</p>
+                @if (!empty($read->bible))
+                    <p><a href="#" id="bibleLink">اضغط لقراءة النص</a></p>
+                @else
+                    <p>لا يوجد كتاب مقدس.</p>
+                @endif
             </div>
+
 
             <div class="part">
                 <h2>الاختبار</h2>
@@ -203,6 +208,23 @@
                    border:none; border-radius:50%; width:30px; height:30px; font-size:18px; cursor:pointer;">×</button>
         </div>
     </div>
+
+    <!-- Bible Modal -->
+    <div id="bibleModal"
+        style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+        background:rgba(0,0,0,0.6); justify-content:center; align-items:center; z-index:9999;">
+        <div
+            style="background:#fff; padding:30px; max-width:800px; width:90%; border-radius:10px; position:relative; max-height:80vh; overflow-y:auto;">
+            <button onclick="closeBibleModal()"
+                style="position:absolute; top:-10px; right:-10px; background:red; color:white;
+                border:none; border-radius:50%; width:30px; height:30px; font-size:18px; cursor:pointer;">×</button>
+            <h2 style="margin-top:0;">{{ $read->read_parts }}</h2>
+            <div id="bibleContent" style="white-space: pre-wrap; line-height: 1.8; color: #333;">
+                {{ $read->bible }}
+            </div>
+        </div>
+    </div>
+
 
     <script>
         // Video logic
@@ -295,6 +317,19 @@
             }
         });
     </script>
+
+    <script>
+        // Bible modal logic
+        document.getElementById('bibleLink')?.addEventListener('click', function(e) {
+            e.preventDefault();
+            document.getElementById('bibleModal').style.display = 'flex';
+        });
+
+        function closeBibleModal() {
+            document.getElementById('bibleModal').style.display = 'none';
+        }
+    </script>
+
 </body>
 
 </html>
