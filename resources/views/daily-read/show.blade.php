@@ -128,6 +128,15 @@
                 الموافق <strong>{{ $read?->getCopticDate() }}</strong>
             </div>
 
+            @if ($read->saintFests)
+                <div class="date-subtitle">
+                    أعياد: <br>
+                    @foreach ($read->saintFests as $fest)
+                        - <strong>{{ $fest->title }}</strong>
+                    @endforeach
+                </div>
+            @endif
+
             @if ($read->description)
                 <div class="part">
                     <h2>الوصف</h2>
@@ -214,7 +223,7 @@
         style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
         background:rgba(0,0,0,0.6); justify-content:center; align-items:center; z-index:9999;">
         <div
-            style="background:#fff; padding:30px; max-width:800px; width:90%; border-radius:10px; position:relative; max-height:80vh; overflow-y:auto;">
+            style="background:#fff; padding:30px; max-width:800px; width:90%; border-radius:15px; position:relative; max-height:80vh; overflow-y:auto;">
             <button onclick="closeBibleModal()"
                 style="position:absolute; top:-10px; right:-10px; background:red; color:white;
                 border:none; border-radius:50%; width:30px; height:30px; font-size:18px; cursor:pointer;">×</button>
@@ -235,6 +244,7 @@
                 openVideoModal(url);
             });
         });
+
 
         function openVideoModal(url) {
             const iframe = document.getElementById('iframePlayer');
@@ -316,18 +326,36 @@
                 clickCount = 0;
             }
         });
+
+        const videoModal = document.getElementById('videoModal');
+        const videoBox = videoModal.querySelector('div'); // this is the black box containing the video
+
+        videoModal.addEventListener('click', function(e) {
+            if (!videoBox.contains(e.target)) {
+                closeVideoModal();
+            }
+        });
     </script>
 
     <script>
-        // Bible modal logic
+        const bibleModal = document.getElementById('bibleModal');
+        const bibleContent = bibleModal.querySelector('div');
+
         document.getElementById('bibleLink')?.addEventListener('click', function(e) {
             e.preventDefault();
-            document.getElementById('bibleModal').style.display = 'flex';
+            bibleModal.style.display = 'flex';
         });
 
         function closeBibleModal() {
-            document.getElementById('bibleModal').style.display = 'none';
+            bibleModal.style.display = 'none';
         }
+
+        // Close when clicking outside the modal content
+        bibleModal.addEventListener('click', function(e) {
+            if (!bibleContent.contains(e.target)) {
+                closeBibleModal();
+            }
+        });
     </script>
 
 </body>

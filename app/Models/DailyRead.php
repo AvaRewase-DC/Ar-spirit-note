@@ -29,6 +29,11 @@ class DailyRead extends Model
         return $this->belongsToMany(DailyReadVideo::class);
     }
 
+    public function saintFests()
+    {
+        return $this->hasMany(SaintFest::class, 'day', 'day');
+    }
+
     public function getCopticDate(): string
     {
         $date = Carbon::parse($this->day ?? today());

@@ -40,6 +40,14 @@
                                 @if (isset($reads[$dayCounter - 1]) && Carbon::parse($reads[$dayCounter - 1]->day)->day == $dayCounter)
                                     {{ $reads[$dayCounter - 1]?->read_parts }}
                                 @endif
+                                @if (isset($reads[$dayCounter - 1]) &&
+                                        Carbon::parse($reads[$dayCounter - 1]->day)->day == $dayCounter &&
+                                        $reads[$dayCounter - 1]->saintFests)
+                                    <hr>
+                                    @foreach ($reads[$dayCounter - 1]?->saintFests as $fest)
+                                        {{ $fest->title }} <br>
+                                    @endforeach
+                                @endif
                             </a>
                         </td>
                         @php $dayCounter++; @endphp
