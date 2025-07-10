@@ -106,7 +106,14 @@
 </head>
 
 <body>
-    <h1 id="calendar-title">شهر {{ $monthsArabic[$month] }} {{ $year }}</h1>
+    <div style="display: flex; align-items: center; justify-content: center; gap: 15px; flex-wrap: wrap;">
+        <h1 id="calendar-title" style="margin: 0;">شهر {{ $monthsArabic[$month] }} {{ $year }}</h1>
+        <a href="{{ route('daily-read.create') }}"
+            style="padding: 10px 15px; background-color: darkred; color: #fff; border-radius: 6px;
+              font-size: 0.85em; text-decoration: none;">
+            + إنشاء قراءة
+        </a>
+    </div>
 
     <!-- Calendar Table Container -->
     <div id="calendar-table">
@@ -135,7 +142,9 @@
 
                 try {
                     const response = await fetch(`/daily-reads?month=${currentMonth}&year=${currentYear}`, {
-                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
                     });
 
                     if (!response.ok) throw new Error('Failed to load calendar');

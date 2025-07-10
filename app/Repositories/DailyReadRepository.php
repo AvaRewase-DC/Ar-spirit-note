@@ -17,6 +17,7 @@ class DailyReadRepository
 
         $reads = $this->model->whereDate('day', '>=', $startOfMonth)
             ->whereDate('day', '<=', $endOfMonth)
+            ->orderBy('day')
             ->get();
 
         return $reads;
@@ -25,7 +26,6 @@ class DailyReadRepository
     public function show($date)
     {
         return $this->model->whereDate('day', $date ?? today())->first();
-
     }
 
     public function store($input)

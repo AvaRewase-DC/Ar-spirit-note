@@ -62,16 +62,6 @@ class DailyReadController extends Controller
 
     public function update(UpdateDailyReadRequest $request, $id)
     {
-        // $validated = $request->validate([
-        //     'day'         => ['required', 'date'],
-        //     'description' => ['nullable', 'string'],
-        //     'katamars'    => ['nullable', 'url'],
-        //     'read_parts'  => ['required', 'string'],
-        //     'bible'       => ['nullable', 'string'],
-        //     'quiz'        => ['nullable', 'url'],
-        //     'videos'      => ['nullable', 'array'],
-        //     'videos.*'    => ['required', 'url'],
-        // ]);
         $read = $this->dailyReadRepository->update($request, $id);
 
         return redirect()

@@ -3,11 +3,41 @@
 
     $startOfMonth = Carbon::create($year, $month, 1);
     $daysInMonth = $startOfMonth->daysInMonth;
-    $startDayOfWeek = $startOfMonth->dayOfWeek; // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+    $startDayOfWeek = $startOfMonth->dayOfWeek; // 0 = Sunday, ..., 6 = Saturday
     $dayCounter = 1;
+    $today = now()->toDateString();
 
     $daysArabic = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
 @endphp
+
+<style>
+    td.today {
+        background-color: #ffe5e5;
+    }
+
+    .date-number {
+        font-weight: bold;
+        font-size: 0.8em;
+        margin-bottom: 5px;
+    }
+
+    .read-part {
+        font-size: 0.9em;
+        color: #333;
+    }
+
+    .saints {
+        font-size: 0.8em;
+        color: darkred;
+    }
+
+    a.day-link {
+        text-decoration: none;
+        color: inherit;
+        display: block;
+        padding: 5px;
+    }
+</style>
 
 <table>
     <thead>
@@ -28,28 +58,37 @@
                     @else
                         @php
                             $currentDate = Carbon::create($year, $month, $dayCounter)->toDateString();
+                            $read = $reads->firstWhere('day', $currentDate);
+                            $isToday = $currentDate === $today;
                         @endphp
-                        <td>
-                            <a href="{{ route('daily-read.show', ['date' => $currentDate]) }}"
-                                style="text-decoration: none; color: inherit; display: block;">
-                                <div class="date-number">{{ $dayCounter }} @if (isset($reads[$dayCounter - 1]) && Carbon::parse($reads[$dayCounter - 1]->day)->day == $dayCounter)
-                                        <br> {{ $reads[$dayCounter - 1]->getCopticDate() }}
+
+                        <td class="{{ $isToday ? 'today' : '' }}">
+                            <a href="{{ route('daily-read.show', ['date' => $currentDate]) }}" class="day-link">
+                                <div class="date-number">
+                                    {{ $dayCounter }}
+                                    @if ($read)
+                                        <br>{{ $read->getCopticDate() }}
                                     @endif
                                 </div>
-                                <hr>
-                                @if (isset($reads[$dayCounter - 1]) && Carbon::parse($reads[$dayCounter - 1]->day)->day == $dayCounter)
-                                    {{ $reads[$dayCounter - 1]?->read_parts }}
-                                @endif
-                                @if (isset($reads[$dayCounter - 1]) &&
-                                        Carbon::parse($reads[$dayCounter - 1]->day)->day == $dayCounter &&
-                                        $reads[$dayCounter - 1]->saintFests)
+
+                                @if ($read)
                                     <hr>
-                                    @foreach ($reads[$dayCounter - 1]?->saintFests as $fest)
-                                        {{ $fest->title }} <br>
-                                    @endforeach
+                                    <div class="read-part">
+                                        {{ Str::limit($read->read_parts, 40) }}
+                                    </div>
+
+                                    @if ($read->saintFests && $read->saintFests->isNotEmpty())
+                                        <hr>
+                                        <div class="saints">
+                                            @foreach ($read->saintFests as $fest)
+                                                • {{ $fest->title }}<br>
+                                            @endforeach
+                                        </div>
+                                    @endif
                                 @endif
                             </a>
                         </td>
+
                         @php $dayCounter++; @endphp
                     @endif
                 @endfor

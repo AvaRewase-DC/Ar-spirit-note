@@ -1,7 +1,7 @@
 @php
     use Carbon\Carbon;
 
-    $parsedDate = Carbon::parse($read?->day ?? today());
+    $parsedDate = Carbon::parse($read?->day);
     Carbon::setLocale('ar');
     $formattedDate = $parsedDate->isoFormat('D MMMM YYYY');
 @endphp
@@ -128,7 +128,7 @@
                 الموافق <strong>{{ $read?->getCopticDate() }}</strong>
             </div>
 
-            @if ($read->saintFests)
+            @if (!$read->saintFests->isEmpty())
                 <div class="date-subtitle">
                     أعياد: <br>
                     @foreach ($read->saintFests as $fest)
@@ -147,11 +147,14 @@
             @if ($read->read_parts)
                 <div class="part">
                     <h2>القراءة</h2>
-                    <p>{{ $read->read_parts }}</p>
+                    @if (!empty($read->bible))
+                        <p><a href="#" id="bibleLink"> {{ $read->read_parts }}</a></p>
+                    @else
+                        <p>{{ $read->read_parts }}</p>
+                    @endif
                 </div>
             @endif
-
-            @if (!empty($read->videos))
+            @if ($read->videos->isNotEmpty())
                 <div class="part">
                     <h2>تفاسير</h2>
                     @foreach ($read->videos as $video)
@@ -159,21 +162,22 @@
                             $url = is_object($video) ? $video->video ?? '#' : $video ?? '#';
                         @endphp
                         @if ($url && $url !== '#')
-                            <p><a href="#" class="video-popup" data-url="{{ $url }}">مشاهدة الفيديو</a>
+                            <p><a href="#" class="video-popup" data-url="{{ $url }}">مشاهدة
+                                    الفيديو</a>
                             </p>
                         @endif
                     @endforeach
                 </div>
             @endif
 
-            <div class="part">
+            {{-- <div class="part">
                 <h2>الكتاب المقدس</h2>
                 @if (!empty($read->bible))
-                    <p><a href="#" id="bibleLink">اضغط لقراءة النص</a></p>
+                    <p><a href="#" id="bibleLink"> {{ $read->read_parts }}</a></p>
                 @else
                     <p>لا يوجد كتاب مقدس.</p>
                 @endif
-            </div>
+            </div> --}}
 
 
             <div class="part">
@@ -201,6 +205,15 @@
             class="back-link">
             العودة إلى التقويم
         </a>
+        @if ($read)
+            <a href="{{ route('daily-read.edit', $read->id) }}"
+                style="display: inline-block; margin-top: 20px; margin-left: 10px;
+              padding: 12px 25px; background-color: darkred; color: #fff;
+              text-decoration: none; border-radius: 6px; font-size: 1em;">
+                تعديل
+            </a>
+        @endif
+
     </div>
 
     <!-- Video Modal -->
@@ -227,9 +240,9 @@
             <button onclick="closeBibleModal()"
                 style="position:absolute; top:-10px; right:-10px; background:red; color:white;
                 border:none; border-radius:50%; width:30px; height:30px; font-size:18px; cursor:pointer;">×</button>
-            <h2 style="margin-top:0;">{{ $read->read_parts }}</h2>
+            <h2 style="margin-top:0;">{{ $read?->read_parts }}</h2>
             <div id="bibleContent" style="white-space: pre-wrap; line-height: 1.8; color: #333;">
-                {{ $read->bible }}
+                {{ $read?->bible }}
             </div>
         </div>
     </div>
