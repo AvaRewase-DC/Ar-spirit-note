@@ -2,13 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Api\BaseController;
 use App\Http\Requests\CreateDailyReadRequest;
 use App\Http\Requests\ShowDailyReadRequest;
 use App\Http\Requests\UpdateDailyReadRequest;
+use App\Http\Resources\DailyReadResource;
 use App\Repositories\DailyReadRepository;
 use Illuminate\Http\Request;
 
-class DailyReadController extends Controller
+class DailyReadController extends BaseController
 {
     public function __construct(protected DailyReadRepository $dailyReadRepository) {}
 
@@ -26,7 +28,9 @@ class DailyReadController extends Controller
         ])->validate();
 
         $reads = $this->dailyReadRepository->index($year, $month);
-
+        if ($request->wantsJson()) {
+            return $this->apiResponse(DailyReadResource::collection($reads));
+        }
         if ($request->ajax()) {
             return view('daily-read.partial-table', compact('reads', 'year', 'month'))->render();
         }
@@ -37,7 +41,12 @@ class DailyReadController extends Controller
     public function show(ShowDailyReadRequest $request)
     {
         $read = $this->dailyReadRepository->show($request->date);
-        $read->load('saintFests', 'videos');
+        $read?->load('saintFests', 'videos');
+        if ($request->wantsJson()) {
+            return $read
+                ? $this->apiResponse(new DailyReadResource($read))
+                : $this->apiErrorResponse('no reads yet', 404);
+        }
 
         return view('daily-read.show', compact('read'));
     }

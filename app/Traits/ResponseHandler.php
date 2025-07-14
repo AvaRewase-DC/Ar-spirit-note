@@ -35,7 +35,7 @@ trait ResponseHandler
      */
     public function respondNotFound($message = null)
     {
-        $message = $message ?? trans('messages.not_found');
+        $message = $message ?? trans('not_found');
 
         return $this->setStatusCode(404)->respondWithError($message);
     }
@@ -46,7 +46,7 @@ trait ResponseHandler
      */
     public function respondInternalError($message = null)
     {
-        $message = $message ?? trans('messages.internal_server_error');
+        $message = $message ?? trans('internal_server_error');
 
         return $this->setStatusCode(500)->respondWithError($message);
     }
@@ -73,7 +73,7 @@ trait ResponseHandler
      */
     public function respondResource($resource, $metaData = [], $status = 200, $message = null, $additional_data = [])
     {
-        $message ?? trans('messages.success');
+        $message ?? trans('success');
 
         DB::commit();
 

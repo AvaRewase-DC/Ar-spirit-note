@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\CopticDayController;
+use App\Http\Controllers\DailyReadController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -21,4 +22,9 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::group(['prefix' => 'coptic-date'], function () {
     Route::get('/', [CopticDayController::class, 'getCopticDate'])->name('api.coptic-date');
+});
+
+Route::group(['prefix' => 'daily-reads'], function () {
+    Route::get('/', [DailyReadController::class, 'index'])->name('api.daily-read.index');
+    Route::get('/{date}', [DailyReadController::class, 'show'])->name('api.daily-read.show');
 });

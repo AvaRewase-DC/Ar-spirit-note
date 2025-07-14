@@ -18,7 +18,7 @@ class BaseController extends Controller
     {
         return response()->json([
             'status_code' => is_array($status_code) ? $status_code[1] : $status_code,
-            'message' => $message ?: trans('messages.success'),
+            'message' => $message ?: trans('success'),
             'data' => $data,
             'additional_data' => $additional_data,
         ]);
@@ -28,7 +28,7 @@ class BaseController extends Controller
     {
         return response()->json([
             'status_code' => is_array($status_code) ? $status_code[1] : $status_code,
-            'message' => $message ?: trans('messages.bad_request'),
+            'message' => $message ?: trans('bad_request'),
         ], is_array($status_code) ? $status_code[0] : $status_code);
     }
 }

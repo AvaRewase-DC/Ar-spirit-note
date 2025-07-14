@@ -9,7 +9,7 @@ class ShowDailyReadRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'date' => 'date',
+            'date' => 'date|exists:daily_reads,day',
         ];
     }
 }
