@@ -6,7 +6,7 @@ use Carbon\Carbon;
 
 class GlobalApiRepository
 {
-    public function getCopticDate($day = null): string
+    public function getCopticDate($day = null)
     {
         $date = Carbon::parse($day ?? now());
         if ($date->hour >= 18) {
@@ -40,6 +40,6 @@ class GlobalApiRepository
 
         $monthName = $copticMonthsArabic[$copticMonth] ?? 'غير معروف';
 
-        return "{$copticDay} {$monthName} {$copticYear}";
+        return compact('copticDay', 'monthName', 'copticYear');
     }
 }
