@@ -20,6 +20,8 @@ class DailyReadRepository
             ->orderBy('day')
             ->get();
 
+        $reads->load('saintFests', 'videos');
+
         return $reads;
     }
 

@@ -128,7 +128,7 @@
                 الموافق <strong>{{ $read?->getCopticDate() }}</strong>
             </div>
 
-            @if (!$read->saintFests->isEmpty())
+            @if ($read->relationLoaded('saintFests') && !$read->saintFests->isEmpty())
                 <div class="date-subtitle">
                     أعياد: <br>
                     @foreach ($read->saintFests as $fest)
@@ -154,7 +154,7 @@
                     @endif
                 </div>
             @endif
-            @if ($read->videos->isNotEmpty())
+            @if ($read->relationLoaded('videos') && $read->videos->isNotEmpty())
                 <div class="part">
                     <h2>تفاسير</h2>
                     @foreach ($read->videos as $video)

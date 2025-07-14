@@ -77,7 +77,7 @@
                                         {{ Str::limit($read->read_parts, 40) }}
                                     </div>
 
-                                    @if ($read->saintFests && $read->saintFests->isNotEmpty())
+                                    @if ($read->relationLoaded('saintFests') && $read->saintFests && $read->saintFests->isNotEmpty())
                                         <hr>
                                         <div class="saints">
                                             @foreach ($read->saintFests as $fest)

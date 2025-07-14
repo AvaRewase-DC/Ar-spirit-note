@@ -37,6 +37,7 @@ class DailyReadController extends Controller
     public function show(ShowDailyReadRequest $request)
     {
         $read = $this->dailyReadRepository->show($request->date);
+        $read->load('saintFests', 'videos');
 
         return view('daily-read.show', compact('read'));
     }
