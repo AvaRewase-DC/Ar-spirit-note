@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\CopticDayController;
+use App\Http\Controllers\Api\QrCodeController;
 use App\Http\Controllers\DailyReadController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -22,6 +23,10 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::group(['prefix' => 'coptic-date'], function () {
     Route::get('/', [CopticDayController::class, 'getCopticDate'])->name('api.coptic-date');
+});
+
+Route::group(['prefix' => 'qr-code'], function () {
+    Route::get('/', [QrCodeController::class, 'generateQrCode'])->name('api.qr-code');
 });
 
 Route::group(['prefix' => 'daily-reads'], function () {

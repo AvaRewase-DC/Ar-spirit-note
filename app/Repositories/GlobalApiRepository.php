@@ -2,6 +2,10 @@
 
 namespace App\Repositories;
 
+use BaconQrCode\Renderer\Image\SvgImageBackEnd;
+use BaconQrCode\Renderer\ImageRenderer;
+use BaconQrCode\Renderer\RendererStyle\RendererStyle;
+use BaconQrCode\Writer;
 use Carbon\Carbon;
 
 class GlobalApiRepository
@@ -41,5 +45,17 @@ class GlobalApiRepository
         $monthName = $copticMonthsArabic[$copticMonth] ?? 'غير معروف';
 
         return compact('copticDay', 'monthName', 'copticYear');
+    }
+
+    public function generateQrCode($data)
+    {
+        $renderer = new ImageRenderer(
+            new RendererStyle(300),
+            new SvgImageBackEnd()
+        );
+        $writer = new Writer($renderer);
+        $qr_pic = $writer->writeString($data);
+
+        return $qr_pic;
     }
 }
