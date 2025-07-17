@@ -2,11 +2,8 @@
 
 namespace App\Repositories;
 
-use BaconQrCode\Renderer\Image\SvgImageBackEnd;
-use BaconQrCode\Renderer\ImageRenderer;
-use BaconQrCode\Renderer\RendererStyle\RendererStyle;
-use BaconQrCode\Writer;
 use Carbon\Carbon;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class GlobalApiRepository
 {
@@ -49,13 +46,6 @@ class GlobalApiRepository
 
     public function generateQrCode($data)
     {
-        $renderer = new ImageRenderer(
-            new RendererStyle(300),
-            new SvgImageBackEnd()
-        );
-        $writer = new Writer($renderer);
-        $qr_pic = $writer->writeString($data);
-
-        return $qr_pic;
+        return QrCode::encoding('UTF-8')->size(400)->generate($data);
     }
 }
