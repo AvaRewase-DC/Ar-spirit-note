@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Requests\CopticDateRequest;
-use App\Http\Resources\CopticDateResource;
 use App\Repositories\GlobalApiRepository;
 
 class CopticDayController extends BaseController
@@ -14,6 +13,6 @@ class CopticDayController extends BaseController
     {
         $copticDate = $this->globalApiRepository->getCopticDate($request->date);
 
-        return $this->apiResponse(new CopticDateResource($copticDate));
+        return json_encode($copticDate, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
     }
 }
