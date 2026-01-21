@@ -3,7 +3,8 @@
 namespace App\Repositories;
 
 use Carbon\Carbon;
-use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use chillerlan\QRCode\QRCode;
+use chillerlan\QRCode\QROptions;
 
 class GlobalApiRepository
 {
@@ -44,8 +45,18 @@ class GlobalApiRepository
         return compact('copticDay', 'monthName', 'copticYear');
     }
 
-    public function generateQrCode($data)
+    public function generateQrCode($data, $size = 400, $format = 'png')
     {
-        return QrCode::encoding('UTF-8')->size(400)->generate($data);
+        $options = new QROptions([
+            'version' => -1, // Auto-detect version based on data length
+            'outputType' => $format === 'svg' ? QRCode::OUTPUT_MARKUP_SVG : QRCode::OUTPUT_IMAGE_PNG,
+            'eccLevel' => QRCode::ECC_L,  // Low error correction for larger data capacity
+            'scale' => (int) ($size / 50), // Scale to approximate the size
+            'imageBase64' => false,
+        ]);
+
+        $qrcode = new QRCode($options);
+
+        return $qrcode->render($data);
     }
 }
