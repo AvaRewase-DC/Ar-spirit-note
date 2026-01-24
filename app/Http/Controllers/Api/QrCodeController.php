@@ -11,20 +11,19 @@ class QrCodeController extends BaseController
 
     /**
      * Generate QR code - Simple API like Google Chart API
-     * GET /api/qr-code?data=YOUR_DATA&size=400&format=png
+     * GET /api/qr-code?data=YOUR_DATA&size=400
      */
     public function generateQrCode(QrCodeRequest $request)
     {
         try {
-            $format = $request->input('format', 'png');
             $size = $request->input('size', 400);
             $data = $request->input('data');
 
-            $qr = $this->globalApiRepository->generateQrCode($data, $size, $format);
+            $qr = $this->globalApiRepository->generateQrCode($data, $size);
 
             // Return image directly like Google Chart API
             return response($qr)
-                ->header('Content-Type', $format === 'svg' ? 'image/svg+xml' : 'image/png')
+                ->header('Content-Type', 'image/png')
                 ->header('Cache-Control', 'public, max-age=86400');
 
         } catch (\Exception $e) {

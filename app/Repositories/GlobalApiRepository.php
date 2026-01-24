@@ -45,18 +45,22 @@ class GlobalApiRepository
         return compact('copticDay', 'monthName', 'copticYear');
     }
 
-    public function generateQrCode($data, $size = 400, $format = 'png')
+    public function generateQrCode($data, $size = 400)
     {
         $options = new QROptions([
             'version' => -1, // Auto-detect version based on data length
-            'outputType' => $format === 'svg' ? QRCode::OUTPUT_MARKUP_SVG : QRCode::OUTPUT_IMAGE_PNG,
+            'outputType' => QRCode::OUTPUT_IMAGE_PNG,
+            'outputBase64' => false, // Return raw PNG binary data
             'eccLevel' => QRCode::ECC_L,  // Low error correction for larger data capacity
             'scale' => (int) ($size / 50), // Scale to approximate the size
             'imageBase64' => false,
+            'imageTransparent' => false, // Solid background for PNG
+            'pngCompression' => 9, // Maximum PNG compression
         ]);
 
         $qrcode = new QRCode($options);
 
+        // Render and return PNG binary data
         return $qrcode->render($data);
     }
 }
