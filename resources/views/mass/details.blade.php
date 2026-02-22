@@ -37,6 +37,37 @@
         .btn {background: #fff; color: var(--ken-primary); border: 1px solid var(--ken-primary); padding: 10px 14px; border-radius: 6px; cursor: pointer;}
         .error {background: #ffe9e9; color: #a00; border: 1px solid #f2b9b9; padding: 10px; border-radius: 6px; margin-bottom: 10px;}
         a {text-decoration: none; color: var(--ken-primary);}
+        .ticket {
+            position: relative;
+            background: #fff7f4;
+            border: 1px dashed rgba(173, 17, 0, 0.35);
+            border-radius: 14px;
+            padding: 16px;
+            text-align: center;
+            box-shadow: 0 6px 16px rgba(0,0,0,.08);
+        }
+        .ticket:before,
+        .ticket:after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            width: 22px;
+            height: 22px;
+            background: var(--ken-bg);
+            border-radius: 50%;
+            transform: translateY(-50%);
+        }
+        .ticket:before {left: -11px; box-shadow: inset -1px 0 0 rgba(173, 17, 0, 0.25);}
+        .ticket:after {right: -11px; box-shadow: inset 1px 0 0 rgba(173, 17, 0, 0.25);}
+        .ticket-title {margin: 0 0 8px; color: var(--ken-primary); font-size: 16px;}
+        .ticket-sub {color: var(--ken-muted); font-size: 13px; margin-bottom: 12px;}
+        .ticket-qr {
+            display: inline-block;
+            padding: 10px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: inset 0 0 0 1px rgba(0,0,0,.06);
+        }
     </style>
 </head>
 <body>
@@ -71,10 +102,13 @@
         @endif
 
         @if (!empty($qrSvg))
-            <div class="card" style="text-align:center;">
-                <h4 style="margin: 0 0 12px;">QR</h4>
-                <div style="display:inline-block; padding: 8px; background: #fff; border-radius: 8px; box-shadow: inset 0 0 0 1px rgba(0,0,0,.06);">
-                    {!! $qrSvg !!}
+            <div class="card">
+                <div class="ticket">
+                    <h4 class="ticket-title">تذكرة الحجز</h4>
+                    <div class="ticket-sub">اعرض الكود عند الدخول</div>
+                    <div class="ticket-qr">
+                        {!! $qrSvg !!}
+                    </div>
                 </div>
             </div>
         @endif
