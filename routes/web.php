@@ -29,7 +29,7 @@ Route::group(['prefix' => 'daily-reads'], function () {
     Route::get('/{date}', [DailyReadController::class, 'show'])->name('daily-read.show');
 });
 
-Route::group(['prefix' => 'mass'], function () {
+Route::group(['prefix' => 'events'], function () {
     Route::get('/', [MassController::class, 'index'])->name('mass.index');
     Route::post('/search', [MassController::class, 'search'])->name('mass.search');
     Route::get('/details', [MassController::class, 'details'])->name('mass.details');
