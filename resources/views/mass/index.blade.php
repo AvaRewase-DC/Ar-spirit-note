@@ -56,7 +56,7 @@
 </head>
 <body>
     <div class="container">
-        <div class="toolbar">حجز الخدمات</div>
+        {{-- <div class="toolbar">حجز الخدمات</div> --}}
 
         @if (session('success'))
             <div class="success">{{ session('success') }}</div>
