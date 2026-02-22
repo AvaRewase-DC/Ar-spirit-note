@@ -91,21 +91,17 @@ class MassController extends Controller
             'familyNumber' => 'required|digits_between:1,5',
             'familyMemberCode' => 'required|digits_between:1,2',
             'memberName' => 'nullable|string|max:255',
-            'nationalId' => ['required', 'regex:/(2|3)[0-9][0-9][0-1][0-9][0-3][0-9](01|02|03|04|11|12|13|14|15|16|17|18|19|21|22|23|24|25|26|27|28|29|31|32|33|34|35|88)\d\d\d\d\d/'],
-            'mobile' => ['required', 'regex:/^(01)[0-9]{9}$/'],
         ]);
-
-        [$birthDate, $gender] = $this->extractBirthAndGender($validated['nationalId']);
 
         $payload = [
             'massAppointmentId' => (string) $validated['massAppointmentId'],
             'membershipNumber' => sprintf('E1C1F%sNR%s', $validated['familyNumber'], $validated['familyMemberCode']),
             'memberName' => $validated['memberName'] ?? '',
-            'birthDate' => $birthDate,
-            'gender' => $gender,
+            'birthDate' => '',
+            'gender' => '',
             'seatNumber' => '',
-            'nationalId' => $validated['nationalId'],
-            'mobile' => $validated['mobile'],
+            'nationalId' => '',
+            'mobile' => '',
             'familyNumber' => $validated['familyNumber'],
             'familyMemberCode' => $validated['familyMemberCode'],
         ];

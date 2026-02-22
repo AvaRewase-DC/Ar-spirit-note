@@ -74,16 +74,6 @@
                 </div>
             </div>
 
-            <div class="card">
-                <input id="nationalId" type="tel" name="nationalId" maxlength="14" placeholder="الرقم القومي" value="{{ old('nationalId') }}" required readonly inputmode="none" autocomplete="off">
-            </div>
-
-            <p class="help">أدخل الرقم القومي الخاص بالأب أو الأم للأعضاء الأقل من 16 سنة الغير معروف الرقم القومي الخاص بهم</p>
-
-            <div class="card">
-                <input id="mobile" type="tel" name="mobile" maxlength="11" placeholder="رقم الموبايل" value="{{ old('mobile') }}" required readonly inputmode="none" autocomplete="off">
-            </div>
-
             <div class="card keypad-wrap" dir="ltr">
                 <div id="keypadActiveLabel" class="keypad-info">الحقل الحالي: رقم العائلة</div>
                 <div class="keypad-grid">
@@ -111,8 +101,6 @@
         (function () {
             const familyNumber = document.getElementById('familyNumber');
             const familyMemberCode = document.getElementById('familyMemberCode');
-            const nationalId = document.getElementById('nationalId');
-            const mobile = document.getElementById('mobile');
             const switchFieldBtn = document.getElementById('switchFieldBtn');
             const backspaceBtn = document.getElementById('backspaceBtn');
             const clearBtn = document.getElementById('clearBtn');
@@ -122,8 +110,6 @@
             const fields = [
                 { el: familyNumber, label: 'رقم العائلة' },
                 { el: familyMemberCode, label: 'كود الفرد' },
-                { el: nationalId, label: 'الرقم القومي' },
-                { el: mobile, label: 'رقم الموبايل' },
             ];
 
             if (fields.some((field) => !field.el)) {
