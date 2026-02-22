@@ -75,7 +75,7 @@
                         <input id="familyNumber" type="tel" maxlength="5" name="familyNumber" value="{{ $model['familyNumber'] ?? '' }}" required readonly inputmode="none" autocomplete="off">
                         <span>NR</span>
                         <input id="familyMemberCode" type="tel" maxlength="2" name="familyMemberCode" value="{{ $model['familyMemberCode'] ?? '' }}" required readonly inputmode="none" autocomplete="off">
-                        <span>رقم العضوية</span>
+                        {{-- <span>رقم العضوية</span> --}}
                     </div>
 
                     <div class="keypad-wrap" dir="ltr">
