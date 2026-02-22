@@ -49,6 +49,8 @@
         .keypad-info {font-size: 13px; color: var(--ken-muted); margin: 8px 0;}
         .keypad-grid {display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;}
         .key-btn {background: #fff; color: var(--ken-primary); border: 1px solid rgba(173,17,0,.25); border-radius: 8px; padding: 12px; font-size: 18px; font-weight: bold; cursor: pointer;}
+        .key-btn:hover {background: rgba(173,17,0,.08);}
+        .key-btn:active {background: rgba(173,17,0,.22); box-shadow: 0 0 0 3px rgba(173,17,0,.2), 0 0 12px rgba(173,17,0,.45); transform: translateY(1px);}
         .key-btn.action {font-size: 14px;}
     </style>
 </head>
