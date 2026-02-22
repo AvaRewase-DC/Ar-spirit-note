@@ -40,6 +40,12 @@
         .success {background: #e9fff1; color: #156f34; border: 1px solid #b9f2cd; padding: 10px; border-radius: 6px; margin-bottom: 10px;}
         .fab-wrap {position: sticky; bottom: 16px; display: flex; justify-content: flex-end;}
         .fab {width: 46px; height: 46px; border-radius: 50%; font-size: 28px; line-height: 46px; text-align: center; padding: 0;}
+        .keypad-wrap {margin-top: 12px;}
+        .active-input {border-color: #2c4ec7 !important; box-shadow: 0 0 0 2px rgba(44, 78, 199, 0.12);}
+        .keypad-info {font-size: 13px; color: #666; margin: 8px 0;}
+        .keypad-grid {display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;}
+        .key-btn {background: #eef2ff; color: #2c4ec7; border: 1px solid #cfd8ff; border-radius: 8px; padding: 12px; font-size: 18px; font-weight: bold; cursor: pointer;}
+        .key-btn.action {font-size: 14px;}
     </style>
 </head>
 <body>
@@ -60,11 +66,31 @@
                     @csrf
                     <div class="inline" dir="ltr">
                         <span>E1C1F</span>
-                        <input type="tel" maxlength="5" name="familyNumber" value="{{ $model['familyNumber'] ?? '' }}" required>
+                        <input id="familyNumber" type="tel" maxlength="5" name="familyNumber" value="{{ $model['familyNumber'] ?? '' }}" required readonly inputmode="none" autocomplete="off">
                         <span>NR</span>
-                        <input type="tel" maxlength="2" name="familyMemberCode" value="{{ $model['familyMemberCode'] ?? '' }}" required>
+                        <input id="familyMemberCode" type="tel" maxlength="2" name="familyMemberCode" value="{{ $model['familyMemberCode'] ?? '' }}" required readonly inputmode="none" autocomplete="off">
                         <span>رقم العضوية</span>
                     </div>
+
+                    <div class="keypad-wrap" dir="ltr">
+                        <div class="keypad-info">استخدم لوحة الأرقام التالية فقط</div>
+                        <div class="keypad-grid">
+                            <button type="button" class="key-btn" data-digit="1">1</button>
+                            <button type="button" class="key-btn" data-digit="2">2</button>
+                            <button type="button" class="key-btn" data-digit="3">3</button>
+                            <button type="button" class="key-btn" data-digit="4">4</button>
+                            <button type="button" class="key-btn" data-digit="5">5</button>
+                            <button type="button" class="key-btn" data-digit="6">6</button>
+                            <button type="button" class="key-btn" data-digit="7">7</button>
+                            <button type="button" class="key-btn" data-digit="8">8</button>
+                            <button type="button" class="key-btn" data-digit="9">9</button>
+                            <button type="button" class="key-btn action" id="switchFieldBtn">تبديل</button>
+                            <button type="button" class="key-btn" data-digit="0">0</button>
+                            <button type="button" class="key-btn action" id="backspaceBtn">حذف</button>
+                            <button type="button" class="key-btn action" id="clearBtn" style="grid-column: span 3;">مسح الكل</button>
+                        </div>
+                    </div>
+
                     <div style="margin-top: 12px;">
                         <button type="submit">بحث</button>
                     </div>
@@ -115,5 +141,72 @@
             </div>
         @endif
     </div>
+
+    <script>
+        (function () {
+            const familyNumber = document.getElementById('familyNumber');
+            const familyMemberCode = document.getElementById('familyMemberCode');
+            const switchFieldBtn = document.getElementById('switchFieldBtn');
+            const backspaceBtn = document.getElementById('backspaceBtn');
+            const clearBtn = document.getElementById('clearBtn');
+            const digitButtons = document.querySelectorAll('[data-digit]');
+
+            if (!familyNumber || !familyMemberCode) {
+                return;
+            }
+
+            let activeField = familyNumber;
+
+            function markActiveField() {
+                familyNumber.classList.remove('active-input');
+                familyMemberCode.classList.remove('active-input');
+                activeField.classList.add('active-input');
+            }
+
+            function blockKeyboardInput(event) {
+                event.preventDefault();
+            }
+
+            [familyNumber, familyMemberCode].forEach(function (input) {
+                input.setAttribute('readonly', 'readonly');
+                input.addEventListener('focus', function () {
+                    activeField = input;
+                    markActiveField();
+                    input.blur();
+                });
+                input.addEventListener('keydown', blockKeyboardInput);
+                input.addEventListener('keypress', blockKeyboardInput);
+                input.addEventListener('paste', blockKeyboardInput);
+                input.addEventListener('drop', blockKeyboardInput);
+            });
+
+            digitButtons.forEach(function (button) {
+                button.addEventListener('click', function () {
+                    const digit = button.getAttribute('data-digit');
+                    const maxLength = Number(activeField.getAttribute('maxlength') || 999);
+                    if (activeField.value.length >= maxLength) return;
+                    activeField.value += digit;
+                });
+            });
+
+            switchFieldBtn.addEventListener('click', function () {
+                activeField = activeField === familyNumber ? familyMemberCode : familyNumber;
+                markActiveField();
+            });
+
+            backspaceBtn.addEventListener('click', function () {
+                activeField.value = activeField.value.slice(0, -1);
+            });
+
+            clearBtn.addEventListener('click', function () {
+                familyNumber.value = '';
+                familyMemberCode.value = '';
+                activeField = familyNumber;
+                markActiveField();
+            });
+
+            markActiveField();
+        })();
+    </script>
 </body>
 </html>
