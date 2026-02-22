@@ -70,6 +70,15 @@
             </div>
         @endif
 
+        @if (!empty($qrSvg))
+            <div class="card" style="text-align:center;">
+                <h4 style="margin: 0 0 12px;">QR</h4>
+                <div style="display:inline-block; padding: 8px; background: #fff; border-radius: 8px; box-shadow: inset 0 0 0 1px rgba(0,0,0,.06);">
+                    {!! $qrSvg !!}
+                </div>
+            </div>
+        @endif
+
         @if ((string) data_get($item, 'status') !== '5' && !$isMassDone)
             <form id="cancel-form" action="{{ route('mass.cancel') }}" method="POST">
                 @csrf

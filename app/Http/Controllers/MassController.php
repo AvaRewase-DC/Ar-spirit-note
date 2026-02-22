@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Repositories\MassRepository;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class MassController extends Controller
 {
@@ -58,11 +59,14 @@ class MassController extends Controller
 
         $massDate = data_get($decoded, 'massAppointment.appointmentDate');
         $isMassDone = $massDate ? Carbon::now()->isAfter(Carbon::parse($massDate)) : false;
+        $qrPayload = $this->formatQrPayload($decoded);
+        $qrSvg = $qrPayload ? QrCode::encoding('UTF-8')->size(200)->margin(1)->generate($qrPayload) : '';
 
         return view('mass.details', [
             'item' => $decoded,
             'isMassDone' => $isMassDone,
             'payload' => $payload,
+            'qrSvg' => $qrSvg,
         ]);
     }
 
@@ -172,5 +176,21 @@ class MassController extends Controller
             'massMessageBody' => config('mass.message_body', ''),
             'massPolicy' => config('mass.policy', ''),
         ];
+    }
+
+    protected function formatQrPayload(array $item): string
+    {
+        $lines = [
+            'الاسم: '.(data_get($item, 'memberName') ?? ''),
+            'رقم العضوية: '.(data_get($item, 'membershipNumber') ?? ''),
+            'حالة الطلب: '.(data_get($item, 'statusName') ?? ''),
+            'التاريخ: '.(data_get($item, 'massAppointment.appointmentDate') ?? ''),
+            'الخدمة: '.(data_get($item, 'massAppointment.title') ?? ''),
+            'المكان: '.(data_get($item, 'massAppointment.place') ?? ''),
+            'المقعد: '.(data_get($item, 'seatNumber') ?? ''),
+            'رقم الطلب: '.(data_get($item, 'requestId') ?? ''),
+        ];
+
+        return trim(implode("\n", $lines));
     }
 }
