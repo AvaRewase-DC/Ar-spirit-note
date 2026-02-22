@@ -38,6 +38,7 @@ class MassController extends Controller
         if (! is_array($dateList)) {
             $dateList = [];
         }
+        $dateList = array_reverse($dateList);
 
         return view('mass.index', [
             'massSetting' => $this->massSettings(),
