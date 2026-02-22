@@ -22,17 +22,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>تفاصيل الخدمة</title>
     <style>
-        body {font-family: Tahoma, sans-serif; background: #f5f6fa; margin: 0;}
+        :root {--ken-primary:#ad1100; --ken-bg:#f4f4f4; --ken-text:#353535; --ken-muted:#7c7c7c; --ken-success:#20bf6b; --ken-gray:#848484; --ken-warning:#ffc409;}
+        body {font-family: Tahoma, sans-serif; background: var(--ken-bg); margin: 0;}
         .container {max-width: 860px; margin: 24px auto; padding: 16px;}
-        .toolbar {background: #2c4ec7; color: #fff; padding: 14px; border-radius: 8px; margin-bottom: 16px;}
+        .toolbar {background: var(--ken-primary); color: #fff; padding: 14px; border-radius: 8px; margin-bottom: 16px;}
         .card {background: #fff; border-radius: 8px; padding: 14px; margin-bottom: 12px; box-shadow: 0 2px 6px rgba(0,0,0,.06);}
-        .muted {color: #666; font-size: 13px;}
-        .status {display: inline-flex; align-items: center; gap: 6px; font-size: 13px; padding: 4px 8px; border-radius: 20px; color: #fff;}
-        .dot {width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,.85);}
-        .gray {background: #6c757d;} .green {background: #23a55a;} .red {background: #dc3545;} .yellow {background: #f0ad4e;}
-        .btn {background: #fff; color: #2c4ec7; border: 1px solid #2c4ec7; padding: 10px 14px; border-radius: 6px; cursor: pointer;}
+        .muted {color: var(--ken-text); font-size: 13px;}
+        .status {display: inline-flex; align-items: center; gap: 6px; font-size: 13px; padding: 4px 8px; border-radius: 20px; color: var(--ken-text);}
+        .dot {width: 8px; height: 8px; border-radius: 50%;}
+        .gray {background: rgba(132,132,132,.12);} .gray .dot {background: var(--ken-gray);}
+        .green {background: rgba(32,191,107,.12);} .green .dot {background: var(--ken-success);}
+        .red {background: rgba(173,17,0,.12);} .red .dot {background: var(--ken-primary);}
+        .yellow {background: rgba(255,196,9,.2);} .yellow .dot {background: var(--ken-warning);}
+        .btn {background: #fff; color: var(--ken-primary); border: 1px solid var(--ken-primary); padding: 10px 14px; border-radius: 6px; cursor: pointer;}
         .error {background: #ffe9e9; color: #a00; border: 1px solid #f2b9b9; padding: 10px; border-radius: 6px; margin-bottom: 10px;}
-        a {text-decoration: none; color: #2c4ec7;}
+        a {text-decoration: none; color: var(--ken-primary);}
     </style>
 </head>
 <body>

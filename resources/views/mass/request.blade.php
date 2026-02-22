@@ -10,16 +10,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>طلب حضور خدمة</title>
     <style>
-        body {font-family: Tahoma, sans-serif; background: #f5f6fa; margin: 0;}
+        :root {--ken-primary:#ad1100; --ken-bg:#f4f4f4; --ken-text:#353535; --ken-muted:#7c7c7c;}
+        body {font-family: Tahoma, sans-serif; background: var(--ken-bg); margin: 0;}
         .container {max-width: 860px; margin: 24px auto; padding: 16px;}
         .card {background: #fff; border-radius: 8px; padding: 14px; margin-bottom: 12px; box-shadow: 0 2px 6px rgba(0,0,0,.06);}
         .title {text-align: center; margin: 0;}
-        .subtitle {text-align: center; color: #666; margin-top: 6px;}
+        .subtitle {text-align: center; color: var(--ken-muted); margin-top: 6px;}
         .label {font-weight: bold; margin-bottom: 10px; display: block;}
         .inline {display: flex; gap: 8px; align-items: center;}
         input[type="text"], input[type="tel"], select {width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box;}
-        .btn {background: #2c4ec7; color: #fff; border: 0; padding: 10px 14px; border-radius: 6px; cursor: pointer; width: 100%;}
-        .help {font-size: 13px; color: #666; margin-top: 8px;}
+        .btn {background: var(--ken-primary); color: #fff; border: 0; padding: 10px 14px; border-radius: 6px; cursor: pointer; width: 100%;}
+        .help {font-size: 13px; color: var(--ken-muted); margin-top: 8px;}
         .error {background: #ffe9e9; color: #a00; border: 1px solid #f2b9b9; padding: 10px; border-radius: 6px; margin-bottom: 10px;}
     </style>
 </head>
@@ -55,7 +56,7 @@
             </div>
 
             <div class="card">
-                <span class="label">ادخل بياناتك الشخصية</span>
+                <span class="label" style="color: var(--ken-primary);">ادخل بياناتك الشخصية</span>
                 <div class="inline" dir="ltr">
                     <span>E1C1F</span>
                     <input type="tel" maxlength="5" name="familyNumber" value="{{ old('familyNumber') }}" required>
