@@ -31,4 +31,8 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'mass' => [
+        'base_url' => env('MASS_REST_API_URL', 'http://41.130.162.206:3000/api/'),
+    ],
+
 ];
