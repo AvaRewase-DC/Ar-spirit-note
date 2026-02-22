@@ -21,6 +21,14 @@
         input[type="text"], input[type="tel"], select {width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box;}
         .btn {background: var(--ken-primary); color: #fff; border: 0; padding: 10px 14px; border-radius: 6px; cursor: pointer; width: 100%;}
         .help {font-size: 13px; color: var(--ken-muted); margin-top: 8px;}
+        .keypad-wrap {margin-top: 12px;}
+        .active-input {border-color: var(--ken-primary) !important; box-shadow: 0 0 0 2px rgba(173, 17, 0, 0.12);}
+        .keypad-info {font-size: 13px; color: var(--ken-muted); margin: 8px 0;}
+        .keypad-grid {display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;}
+        .key-btn {background: #fff; color: var(--ken-primary); border: 1px solid rgba(173,17,0,.25); border-radius: 8px; padding: 12px; font-size: 18px; font-weight: bold; cursor: pointer;}
+        .key-btn:hover {background: rgba(173,17,0,.08);}
+        .key-btn:active {background: rgba(173,17,0,.22); box-shadow: 0 0 0 3px rgba(173,17,0,.2), 0 0 12px rgba(173,17,0,.45); transform: translateY(1px);}
+        .key-btn.action {font-size: 14px;}
         .error {background: #ffe9e9; color: #a00; border: 1px solid #f2b9b9; padding: 10px; border-radius: 6px; margin-bottom: 10px;}
     </style>
 </head>
@@ -59,37 +67,40 @@
                 <span class="label" style="color: var(--ken-primary);">ادخل بياناتك الشخصية</span>
                 <div class="inline" dir="ltr">
                     <span>E1C1F</span>
-                    <input type="tel" maxlength="5" name="familyNumber" value="{{ old('familyNumber') }}" required>
+                    <input id="familyNumber" type="tel" maxlength="5" name="familyNumber" value="{{ old('familyNumber') }}" required readonly inputmode="none" autocomplete="off">
                     <span>NR</span>
-                    <input type="tel" maxlength="2" name="familyMemberCode" value="{{ old('familyMemberCode') }}" required>
+                    <input id="familyMemberCode" type="tel" maxlength="2" name="familyMemberCode" value="{{ old('familyMemberCode') }}" required readonly inputmode="none" autocomplete="off">
                     <span>رقم العضوية</span>
                 </div>
             </div>
 
             <div class="card">
-                <input type="text" name="memberName" placeholder="الاسم بالكامل" value="{{ old('memberName') }}" required>
-            </div>
-
-            <div class="card">
-                <input type="tel" name="nationalId" maxlength="14" placeholder="الرقم القومي" value="{{ old('nationalId') }}" required oninput="parseNationalId()">
+                <input id="nationalId" type="tel" name="nationalId" maxlength="14" placeholder="الرقم القومي" value="{{ old('nationalId') }}" required readonly inputmode="none" autocomplete="off">
             </div>
 
             <p class="help">أدخل الرقم القومي الخاص بالأب أو الأم للأعضاء الأقل من 16 سنة الغير معروف الرقم القومي الخاص بهم</p>
 
             <div class="card">
-                <input type="tel" name="mobile" maxlength="11" placeholder="رقم الموبايل" value="{{ old('mobile') }}" required>
+                <input id="mobile" type="tel" name="mobile" maxlength="11" placeholder="رقم الموبايل" value="{{ old('mobile') }}" required readonly inputmode="none" autocomplete="off">
             </div>
 
-            <div class="card">
-                <input type="text" id="birthDate" name="birthDateDisplay" placeholder="تاريخ الميلاد" value="" disabled>
-            </div>
-
-            <div class="card">
-                <select id="gender" name="genderDisplay" disabled>
-                    <option value="">النوع</option>
-                    <option value="0">ذكر</option>
-                    <option value="1">انثي</option>
-                </select>
+            <div class="card keypad-wrap" dir="ltr">
+                <div id="keypadActiveLabel" class="keypad-info">الحقل الحالي: رقم العائلة</div>
+                <div class="keypad-grid">
+                    <button type="button" class="key-btn" data-digit="1">1</button>
+                    <button type="button" class="key-btn" data-digit="2">2</button>
+                    <button type="button" class="key-btn" data-digit="3">3</button>
+                    <button type="button" class="key-btn" data-digit="4">4</button>
+                    <button type="button" class="key-btn" data-digit="5">5</button>
+                    <button type="button" class="key-btn" data-digit="6">6</button>
+                    <button type="button" class="key-btn" data-digit="7">7</button>
+                    <button type="button" class="key-btn" data-digit="8">8</button>
+                    <button type="button" class="key-btn" data-digit="9">9</button>
+                    <button type="button" class="key-btn action" id="switchFieldBtn">تبديل</button>
+                    <button type="button" class="key-btn" data-digit="0">0</button>
+                    <button type="button" class="key-btn action" id="backspaceBtn">حذف</button>
+                    <button type="button" class="key-btn action" id="clearBtn" style="grid-column: span 3;">مسح الكل</button>
+                </div>
             </div>
 
             <button class="btn" type="submit">حجز الخدمة</button>
@@ -97,20 +108,86 @@
     </div>
 
     <script>
-        function parseNationalId() {
-            const nationalId = (document.querySelector('input[name="nationalId"]').value || '').replace(/\D/g, '');
-            if (nationalId.length < 13) return;
+        (function () {
+            const familyNumber = document.getElementById('familyNumber');
+            const familyMemberCode = document.getElementById('familyMemberCode');
+            const nationalId = document.getElementById('nationalId');
+            const mobile = document.getElementById('mobile');
+            const switchFieldBtn = document.getElementById('switchFieldBtn');
+            const backspaceBtn = document.getElementById('backspaceBtn');
+            const clearBtn = document.getElementById('clearBtn');
+            const digitButtons = document.querySelectorAll('[data-digit]');
+            const activeLabel = document.getElementById('keypadActiveLabel');
 
-            const century = nationalId[0] === '2' ? '19' : '20';
-            const year = century + nationalId.substring(1, 3);
-            const month = nationalId.substring(3, 5);
-            const day = nationalId.substring(5, 7);
+            const fields = [
+                { el: familyNumber, label: 'رقم العائلة' },
+                { el: familyMemberCode, label: 'كود الفرد' },
+                { el: nationalId, label: 'الرقم القومي' },
+                { el: mobile, label: 'رقم الموبايل' },
+            ];
 
-            document.getElementById('birthDate').value = `${year}-${month}-${day}`;
-            const genderDigit = parseInt(nationalId.substring(12, 13), 10);
-            document.getElementById('gender').value = Number.isNaN(genderDigit) ? '' : (genderDigit % 2 === 0 ? '1' : '0');
-        }
-        parseNationalId();
+            if (fields.some((field) => !field.el)) {
+                return;
+            }
+
+            let activeIndex = 0;
+
+            function markActiveField() {
+                fields.forEach((field, index) => {
+                    field.el.classList.toggle('active-input', index === activeIndex);
+                });
+                if (activeLabel) {
+                    activeLabel.textContent = `الحقل الحالي: ${fields[activeIndex].label}`;
+                }
+            }
+
+            function blockKeyboardInput(event) {
+                event.preventDefault();
+            }
+
+            fields.forEach((field, index) => {
+                field.el.setAttribute('readonly', 'readonly');
+                field.el.addEventListener('focus', function () {
+                    activeIndex = index;
+                    markActiveField();
+                    field.el.blur();
+                });
+                field.el.addEventListener('keydown', blockKeyboardInput);
+                field.el.addEventListener('keypress', blockKeyboardInput);
+                field.el.addEventListener('paste', blockKeyboardInput);
+                field.el.addEventListener('drop', blockKeyboardInput);
+            });
+
+            digitButtons.forEach(function (button) {
+                button.addEventListener('click', function () {
+                    const digit = button.getAttribute('data-digit');
+                    const activeField = fields[activeIndex].el;
+                    const maxLength = Number(activeField.getAttribute('maxlength') || 999);
+                    if (activeField.value.length >= maxLength) return;
+                    activeField.value += digit;
+                });
+            });
+
+            switchFieldBtn.addEventListener('click', function () {
+                activeIndex = (activeIndex + 1) % fields.length;
+                markActiveField();
+            });
+
+            backspaceBtn.addEventListener('click', function () {
+                const activeField = fields[activeIndex].el;
+                activeField.value = activeField.value.slice(0, -1);
+            });
+
+            clearBtn.addEventListener('click', function () {
+                fields.forEach((field) => {
+                    field.el.value = '';
+                });
+                activeIndex = 0;
+                markActiveField();
+            });
+
+            markActiveField();
+        })();
     </script>
 </body>
 </html>
