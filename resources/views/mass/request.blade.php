@@ -42,12 +42,11 @@
             @csrf
 
             <div class="card">
-                <h2 class="title">طلب حضور خدمة</h2>
-                <p class="subtitle">برجاء ادخال البيانات المطلوبه ادناه لتتمكن من تسجيل حضور الخدمة</p>
+                <h2 class="title">طلب حجز خدمة</h2>
             </div>
 
             <div class="card">
-                <span class="label">اختر الخدمة</span>
+                <span class="label"> الخدمة</span>
                 <select name="massAppointmentId" required>
                     <option value="">اختر الخدمة</option>
                     @foreach ($appointments as $item)
@@ -64,7 +63,7 @@
             </div>
 
             <div class="card">
-                <span class="label" style="color: var(--ken-primary);">ادخل بياناتك الشخصية</span>
+                <span class="label" style="color: var(--ken-primary);"> بياناتك الشخصية</span>
                 <div class="inline" dir="ltr">
                     <span>E1C1F</span>
                     <input id="familyNumber" type="tel" maxlength="5" name="familyNumber" value="{{ old('familyNumber') }}" required readonly inputmode="none" autocomplete="off">
