@@ -103,7 +103,7 @@ class MassController extends Controller
             'membershipNumber' => sprintf('E1C1F%sNR%s', $validated['familyNumber'], $validated['familyMemberCode']),
             'memberName' => $validated['memberName'] ?? '',
             'birthDate' => '2001-1-1',
-            'gender' => '',
+            'gender' => '1',
             'seatNumber' => '',
             'nationalId' => '30201010100000',
             'mobile' => '0100000000',
