@@ -13,6 +13,33 @@ class MassRepository
         $this->baseUrl = rtrim(config('services.mass.base_url', 'http://41.130.162.206:3000/api/'), '/').'/';
     }
 
+    public function getMassSettings(): array
+    {
+        try {
+            $response = Http::acceptJson()->timeout(10)->get('https://kenesty.firebaseio.com/mass-settings.json');
+            $data = json_decode($response->body(), true);
+
+            if (is_array($data) && isset($data['massEnabled'])) {
+                return [
+                    'massEnabled' => (bool) ($data['massEnabled'] ?? true),
+                    'massMessageTitle' => $data['massMessageTitle'] ?? '',
+                    'massMessageBody' => $data['massMessageBody'] ?? '',
+                    'massPolicy' => $data['massPolicy'] ?? '',
+                ];
+            }
+        } catch (\Throwable $e) {
+            // fall through to config fallback
+        }
+
+        // Fallback to local config
+        return [
+            'massEnabled' => (bool) config('mass.enabled', true),
+            'massMessageTitle' => config('mass.message_title', ''),
+            'massMessageBody' => config('mass.message_body', ''),
+            'massPolicy' => config('mass.policy', ''),
+        ];
+    }
+
     public function getActiveAppointments()
     {
         $response = Http::acceptJson()->timeout(20)->get($this->baseUrl.'mass-appointments/get-active-appointments');

@@ -55,8 +55,12 @@
     </style>
 </head>
 <body>
+        {{-- <div class="container">
+            <div class="card">
+            حجز الخدمات
+            </div>
+        </div> --}}
     <div class="container">
-        {{-- <div class="toolbar">حجز الخدمات</div> --}}
 
         @if (session('success'))
             <div class="success">{{ session('success') }}</div>
@@ -66,8 +70,13 @@
         @endif
 
         @if ($massSetting['massEnabled'])
+            <div class="card" style="display:flex; align-items:center; justify-content:space-between; padding: 12px 14px;">
+                <span style="font-size:15px; font-weight:bold; color:var(--ken-primary);"> حجز خدمة جديد رجاء الضغط على علامه '+'</span>
+                <a href="{{ route('mass.policy') }}" class="btn fab" style="text-decoration:none;">+</a>
+            </div>
+
             <div class="card">
-                <span class="label">بحث برقم العضوية</span>
+                <span class="label">بحث برقم العضوية في طلبات الحجز السابقة</span>
                 <form action="{{ route('mass.search') }}" method="POST">
                     @csrf
                     <div class="inline" dir="ltr">
@@ -94,11 +103,11 @@
                             <button type="button" class="key-btn" data-digit="0">0</button>
                             <button type="button" class="key-btn action" id="backspaceBtn">حذف</button>
                             <button type="button" class="key-btn action" id="clearBtn" style="grid-column: span 3;">مسح الكل</button>
+                            <button type="submit" class="key-btn action" style="grid-column: span 3; background: var(--ken-primary); color: #fff; border-color: var(--ken-primary);">بحث</button>
                         </div>
                     </div>
 
                     <div style="margin-top: 12px;">
-                        <button type="submit">بحث</button>
                     </div>
                 </form>
             </div>
@@ -106,7 +115,7 @@
             @if (count($dateList) === 0)
                 <div class="hint">
                     @if (!$isSearch)
-                        برجاء ادخال رقم العضوية و الضغط علي بحث
+                        {{-- برجاء ادخال رقم العضوية و الضغط علي بحث --}}
                     @else
                         لا يوجد حجوزات لهذا العضو..<br>يمكنك اضافة طلب جديد عن طريق زر "+" بالاسفل
                     @endif

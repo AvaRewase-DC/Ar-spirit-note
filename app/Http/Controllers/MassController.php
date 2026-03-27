@@ -86,6 +86,7 @@ class MassController extends Controller
 
         return view('mass.request', [
             'appointments' => $appointments,
+            'massSetting' => $this->massSettings(),
         ]);
     }
 
@@ -95,18 +96,22 @@ class MassController extends Controller
             'massAppointmentId' => 'required',
             'familyNumber' => 'required|digits_between:1,5',
             'familyMemberCode' => 'required|digits_between:1,2',
-            'memberName' => 'nullable|string|max:255',
+            'memberName' => 'required|string|max:255',
+            'nationalId' => ['required', 'digits:14', 'regex:/(2|3)[0-9][0-9][0-1][0-9][0-3][0-9](01|02|03|04|11|12|13|14|15|16|17|18|19|21|22|23|24|25|26|27|28|29|31|32|33|34|35|88)\d\d\d\d\d/'],
+            'mobile' => ['required', 'digits:11', 'regex:/^(01)[0-9]{9}$/'],
         ]);
+
+        [$birthDate, $gender] = $this->extractBirthAndGender($validated['nationalId']);
 
         $payload = [
             'massAppointmentId' => (string) $validated['massAppointmentId'],
             'membershipNumber' => sprintf('E1C1F%sNR%s', $validated['familyNumber'], $validated['familyMemberCode']),
-            'memberName' => $validated['memberName'] ?? '',
-            'birthDate' => '2001-1-1',
-            'gender' => '1',
+            'memberName' => $validated['memberName'],
+            'birthDate' => $birthDate ?: '2001-01-01',
+            'gender' => $gender ?: '0',
             'seatNumber' => '',
-            'nationalId' => '30201010100000',
-            'mobile' => '0100000000',
+            'nationalId' => $validated['nationalId'],
+            'mobile' => $validated['mobile'],
             'familyNumber' => $validated['familyNumber'],
             'familyMemberCode' => $validated['familyMemberCode'],
         ];
@@ -170,11 +175,13 @@ class MassController extends Controller
 
     protected function massSettings(): array
     {
+        $apiSettings = $this->massRepository->getMassSettings();
+
         return [
-            'massEnabled' => (bool) config('mass.enabled', true),
-            'massMessageTitle' => config('mass.message_title', ''),
-            'massMessageBody' => config('mass.message_body', ''),
-            'massPolicy' => config('mass.policy', ''),
+            'massEnabled' => (bool) ($apiSettings['massEnabled'] ?? config('mass.enabled', true)),
+            'massMessageTitle' => $apiSettings['massMessageTitle'] ?? config('mass.message_title', ''),
+            'massMessageBody' => $apiSettings['massMessageBody'] ?? config('mass.message_body', ''),
+            'massPolicy' => $apiSettings['massPolicy'] ?? config('mass.policy', ''),
         ];
     }
 
