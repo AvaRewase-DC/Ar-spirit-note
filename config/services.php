@@ -33,6 +33,7 @@ return [
 
     'mass' => [
         'base_url' => env('MASS_REST_API_URL', 'http://41.130.162.206:3000/api/'),
+        'firebase_url' => env('MASS_FIREBASE_URL', 'https://kenesty.firebaseio.com'),
     ],
 
 ];

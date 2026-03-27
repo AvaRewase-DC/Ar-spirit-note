@@ -17,23 +17,20 @@
         .title {text-align: center; margin: 0;}
         .subtitle {text-align: center; color: var(--ken-muted); margin-top: 6px;}
         .label {font-weight: bold; margin-bottom: 10px; display: block;}
-        .inline {display: flex; gap: 8px; align-items: center;}
+        .inline {display: flex; gap: 8px; align-items: center; flex-wrap: nowrap;}
+        .inline input[type="tel"] {flex: 1; min-width: 0; width: auto;}
+        .inline span {flex-shrink: 0; white-space: nowrap;}
         input[type="text"], input[type="tel"], select {width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box;}
         .btn {background: var(--ken-primary); color: #fff; border: 0; padding: 10px 14px; border-radius: 6px; cursor: pointer; width: 100%;}
         .help {font-size: 13px; color: var(--ken-muted); margin-top: 8px;}
-        .keypad-wrap {margin-top: 12px;}
-        .active-input {border-color: var(--ken-primary) !important; box-shadow: 0 0 0 2px rgba(173, 17, 0, 0.12);}
-        .keypad-info {font-size: 13px; color: var(--ken-muted); margin: 8px 0;}
-        .keypad-grid {display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;}
-        .key-btn {background: #fff; color: var(--ken-primary); border: 1px solid rgba(173,17,0,.25); border-radius: 8px; padding: 12px; font-size: 18px; font-weight: bold; cursor: pointer;}
-        .key-btn:hover {background: rgba(173,17,0,.08);}
-        .key-btn:active {background: rgba(173,17,0,.22); box-shadow: 0 0 0 3px rgba(173,17,0,.2), 0 0 12px rgba(173,17,0,.45); transform: translateY(1px);}
-        .key-btn.action {font-size: 14px;}
+        /* validation */
+        .field-error {font-size:13px; color:#a00; margin-top:5px; display:none;}
+        .input-invalid {border-color:#a00 !important; box-shadow:0 0 0 2px rgba(160,0,0,.12) !important;}
         .error {background: #ffe9e9; color: #a00; border: 1px solid #f2b9b9; padding: 10px; border-radius: 6px; margin-bottom: 10px;}
         .id-derived {display: flex; gap: 12px; margin-top: 12px;}
         .id-derived .field {flex:1;}
         .id-derived label {font-size: 12px; color: var(--ken-muted); display:block; margin-bottom:4px;}
-        .id-derived input[type="text"] {background:#f9f9f9; color:var(--ken-text); font-size:14px; cursor:default;}
+        .id-derived input[type="text"] {background:#f4f4f4; color:var(--ken-text); font-size:14px; cursor:default; pointer-events:none;}
     </style>
 </head>
 <body>
@@ -70,51 +67,34 @@
                 <span class="label" style="color: var(--ken-primary);"> بياناتك الشخصية</span>
                 <div class="inline" dir="ltr">
                     <span>E1C1F</span>
-                    <input id="familyNumber" type="tel" maxlength="5" name="familyNumber" value="{{ old('familyNumber') }}" required readonly inputmode="none" autocomplete="off">
+                    <input id="familyNumber" type="tel" maxlength="5" name="familyNumber" value="{{ old('familyNumber') }}" required autocomplete="off" placeholder="-----">
                     <span>NR</span>
-                    <input id="familyMemberCode" type="tel" maxlength="2" name="familyMemberCode" value="{{ old('familyMemberCode') }}" required readonly inputmode="none" autocomplete="off">
+                    <input id="familyMemberCode" type="tel" maxlength="2" name="familyMemberCode" value="{{ old('familyMemberCode') }}" required autocomplete="off" placeholder="--">
                     <span>رقم العضوية</span>
-                </div>
-            </div>
-
-            <div class="card keypad-wrap" dir="ltr">
-                <div id="keypadActiveLabel" class="keypad-info">الحقل الحالي: رقم العائلة</div>
-                <div class="keypad-grid">
-                    <button type="button" class="key-btn" data-digit="1">1</button>
-                    <button type="button" class="key-btn" data-digit="2">2</button>
-                    <button type="button" class="key-btn" data-digit="3">3</button>
-                    <button type="button" class="key-btn" data-digit="4">4</button>
-                    <button type="button" class="key-btn" data-digit="5">5</button>
-                    <button type="button" class="key-btn" data-digit="6">6</button>
-                    <button type="button" class="key-btn" data-digit="7">7</button>
-                    <button type="button" class="key-btn" data-digit="8">8</button>
-                    <button type="button" class="key-btn" data-digit="9">9</button>
-                    <button type="button" class="key-btn action" id="switchFieldBtn">تبديل</button>
-                    <button type="button" class="key-btn" data-digit="0">0</button>
-                    <button type="button" class="key-btn action" id="backspaceBtn">حذف</button>
-                    <button type="button" class="key-btn action" id="clearBtn" style="grid-column: span 3;">مسح الكل</button>
                 </div>
             </div>
 
             <div class="card">
                 <span class="label" style="color: var(--ken-primary);">الاسم بالكامل</span>
-                <input type="text" name="memberName" value="{{ old('memberName') }}" placeholder="الاسم بالكامل" required>
+                <input id="memberName" type="text" name="memberName" value="{{ old('memberName') }}" required>
+                <div class="field-error" id="nameError">الاسم يجب أن يحتوي على جزءين على الأقل (الاسم الأول واسم العائلة)</div>
             </div>
 
             <div class="card">
                 <span class="label" style="color: var(--ken-primary);">الرقم القومي</span>
-                <input id="nationalId" type="tel" name="nationalId" maxlength="14" minlength="14" value="{{ old('nationalId') }}" placeholder="الرقم القومي (14 رقم)" required pattern="(2|3)[0-9][0-9][0-1][0-9][0-3][0-9](01|02|03|04|11|12|13|14|15|16|17|18|19|21|22|23|24|25|26|27|28|29|31|32|33|34|35|88)\d\d\d\d\d">
+                <input id="nationalId" type="tel" name="nationalId" maxlength="14" minlength="14" value="{{ old('nationalId') }}" placeholder="الرقم القومي (14 رقم)" required autocomplete="off" inputmode="numeric" pattern="[0-9]*">
+                <div class="field-error" id="nationalIdError">الرقم القومي يجب أن يكون 14 رقم ويبدأ بـ 2 أو 3</div>
                 <p class="help">أدخل الرقم القومي الخاص بالأب أو الأم للأعضاء الأقل من 16 سنة الغير معروف الرقم القومي الخاص بهم</p>
 
-                {{-- auto-derived read-only display --}}
-                <div class="id-derived" id="idDerivedWrap" style="display:none;">
+                {{-- auto-derived read-only display - always visible --}}
+                <div class="id-derived" id="idDerivedWrap">
                     <div class="field">
                         <label>تاريخ الميلاد</label>
-                        <input type="text" id="birthDateDisplay" readonly tabindex="-1">
+                        <input type="text" id="birthDateDisplay" readonly tabindex="-1" placeholder="يتم حسابه تلقائياً">
                     </div>
                     <div class="field">
                         <label>النوع</label>
-                        <input type="text" id="genderDisplay" readonly tabindex="-1">
+                        <input type="text" id="genderDisplay" readonly tabindex="-1" placeholder="يتم تحديده تلقائياً">
                     </div>
                 </div>
 
@@ -125,7 +105,8 @@
 
             <div class="card">
                 <span class="label" style="color: var(--ken-primary);">رقم الموبايل</span>
-                <input type="tel" name="mobile" maxlength="11" minlength="11" value="{{ old('mobile') }}" placeholder="رقم الموبايل (11 رقم)" required pattern="(01)[0-9]{9}">
+                    <input id="mobileInput" type="tel" name="mobile" maxlength="11" minlength="11" value="{{ old('mobile') }}" placeholder="رقم الموبايل (11 رقم)" required autocomplete="off" inputmode="numeric" pattern="[0-9]*">
+                <div class="field-error" id="mobileError">رقم الموبايل يجب أن يكون 11 رقم</div>
             </div>
 
             <button class="btn" type="submit">حجز الخدمة</button>
@@ -133,84 +114,7 @@
     </div>
 
     <script>
-        (function () {
-            const familyNumber = document.getElementById('familyNumber');
-            const familyMemberCode = document.getElementById('familyMemberCode');
-            const switchFieldBtn = document.getElementById('switchFieldBtn');
-            const backspaceBtn = document.getElementById('backspaceBtn');
-            const clearBtn = document.getElementById('clearBtn');
-            const digitButtons = document.querySelectorAll('[data-digit]');
-            const activeLabel = document.getElementById('keypadActiveLabel');
-
-            const fields = [
-                { el: familyNumber, label: 'رقم العائلة' },
-                { el: familyMemberCode, label: 'كود الفرد' },
-            ];
-
-            if (fields.some((field) => !field.el)) {
-                return;
-            }
-
-            let activeIndex = 0;
-
-            function markActiveField() {
-                fields.forEach((field, index) => {
-                    field.el.classList.toggle('active-input', index === activeIndex);
-                });
-                if (activeLabel) {
-                    activeLabel.textContent = `الحقل الحالي: ${fields[activeIndex].label}`;
-                }
-            }
-
-            function blockKeyboardInput(event) {
-                event.preventDefault();
-            }
-
-            fields.forEach((field, index) => {
-                field.el.setAttribute('readonly', 'readonly');
-                field.el.addEventListener('focus', function () {
-                    activeIndex = index;
-                    markActiveField();
-                    field.el.blur();
-                });
-                field.el.addEventListener('keydown', blockKeyboardInput);
-                field.el.addEventListener('keypress', blockKeyboardInput);
-                field.el.addEventListener('paste', blockKeyboardInput);
-                field.el.addEventListener('drop', blockKeyboardInput);
-            });
-
-            digitButtons.forEach(function (button) {
-                button.addEventListener('click', function () {
-                    const digit = button.getAttribute('data-digit');
-                    const activeField = fields[activeIndex].el;
-                    const maxLength = Number(activeField.getAttribute('maxlength') || 999);
-                    if (activeField.value.length >= maxLength) return;
-                    activeField.value += digit;
-                });
-            });
-
-            switchFieldBtn.addEventListener('click', function () {
-                activeIndex = (activeIndex + 1) % fields.length;
-                markActiveField();
-            });
-
-            backspaceBtn.addEventListener('click', function () {
-                const activeField = fields[activeIndex].el;
-                activeField.value = activeField.value.slice(0, -1);
-            });
-
-            clearBtn.addEventListener('click', function () {
-                fields.forEach((field) => {
-                    field.el.value = '';
-                });
-                activeIndex = 0;
-                markActiveField();
-            });
-
-            markActiveField();
-        })();
-
-        // Auto-derive birthDate & gender from Egyptian national ID (mirrors mobile handelEgyptianId)
+        // ── Auto-derive birthDate & gender from Egyptian national ID ────────
         (function () {
             const nationalIdInput  = document.getElementById('nationalId');
             const birthDateInput   = document.getElementById('birthDateInput');
@@ -218,56 +122,121 @@
             const birthDateDisplay = document.getElementById('birthDateDisplay');
             const genderDisplay    = document.getElementById('genderDisplay');
             const derivedWrap      = document.getElementById('idDerivedWrap');
+            const nidError         = document.getElementById('nationalIdError');
 
             if (!nationalIdInput) return;
 
             function handleEgyptianId() {
-                const raw    = nationalIdInput.value.replace(/\D/g, '');
-                const digits = raw.split('');
+                const digits = nationalIdInput.value.replace(/\D/g, '').split('');
 
                 if (digits.length !== 14) {
-                    // Clear derived values when ID is incomplete
-                    birthDateInput.value   = '';
-                    genderInput.value      = '';
-                    birthDateDisplay.value = '';
-                    genderDisplay.value    = '';
-                    if (derivedWrap) derivedWrap.style.display = 'none';
+                    birthDateInput.value = genderInput.value = '';
+                    birthDateDisplay.value = genderDisplay.value = '';
                     return;
                 }
 
-                // Century: '2' → 19xx, '3' → 20xx
-                const century = digits[0] === '2' ? '19' : '20';
-                const year    = century + digits[1] + digits[2];
-                const month   = digits[3] + digits[4];
-                const day     = digits[5] + digits[6];
-
-                const birthDate = `${year}-${month}-${day}`;
-                // 13th digit (index 12): odd → male (0), even → female (1)
-                const gender = Number(digits[12]) % 2 === 0 ? '1' : '0';
+                const century   = digits[0] === '2' ? '19' : '20';
+                const birthDate = `${century}${digits[1]}${digits[2]}-${digits[3]}${digits[4]}-${digits[5]}${digits[6]}`;
+                const gender    = Number(digits[12]) % 2 === 0 ? '1' : '0';
 
                 birthDateInput.value   = birthDate;
                 genderInput.value      = gender;
                 birthDateDisplay.value = birthDate;
                 genderDisplay.value    = gender === '0' ? 'ذكر' : 'أنثى';
-
-                if (derivedWrap) derivedWrap.style.display = 'flex';
             }
 
-            nationalIdInput.addEventListener('input', handleEgyptianId);
-            nationalIdInput.addEventListener('change', handleEgyptianId);
-
-            // Run on page load in case of old() repopulation
-            if (nationalIdInput.value.length === 14) handleEgyptianId();
-
-            // Clear display when ID becomes invalid length
             nationalIdInput.addEventListener('input', function () {
-                if (nationalIdInput.value.length < 14) {
-                    birthDateInput.value   = '';
-                    genderInput.value      = '';
-                    birthDateDisplay.value = '';
-                    genderDisplay.value    = '';
+                // Strip any non-digit characters
+                const clean = nationalIdInput.value.replace(/\D/g, '');
+                if (clean !== nationalIdInput.value) {
+                    nationalIdInput.value = clean;
                 }
+                handleEgyptianId();
             });
+            if (nationalIdInput.value.length === 14) handleEgyptianId();
+        })();
+
+        // ── Client-side form validation ─────────────────────────────────────
+        (function () {
+            const form        = document.querySelector('form');
+            const nameInput   = document.getElementById('memberName');
+            const nidInput    = document.getElementById('nationalId');
+            const mobileInput = document.getElementById('mobileInput');
+            const nameErr     = document.getElementById('nameError');
+            const nidErr      = document.getElementById('nationalIdError');
+            const mobileErr   = document.getElementById('mobileError');
+
+            function showErr(input, errEl, show) {
+                if (show) {
+                    input.classList.add('input-invalid');
+                    errEl.style.display = 'block';
+                } else {
+                    input.classList.remove('input-invalid');
+                    errEl.style.display = 'none';
+                }
+            }
+
+            // Live validation
+            if (nameInput) {
+                nameInput.addEventListener('blur', function () {
+                    const parts = nameInput.value.trim().split(/\s+/).filter(Boolean);
+                    showErr(nameInput, nameErr, parts.length < 2);
+                });
+            }
+
+            if (nidInput) {
+                nidInput.addEventListener('input', function () {
+                    const v = nidInput.value.replace(/\D/g, '');
+                    const ok = v.length === 14 && /^[23]/.test(v);
+                    showErr(nidInput, nidErr, nidInput.value.length > 0 && !ok);
+                });
+            }
+
+            if (mobileInput) {
+                mobileInput.addEventListener('input', function () {
+                    // enforce digits only
+                    const clean = mobileInput.value.replace(/\D/g, '');
+                    if (clean !== mobileInput.value) mobileInput.value = clean;
+                    const ok = clean.length === 11 && /^(010|011|012)[0-9]{8}$/.test(clean);
+                    showErr(mobileInput, mobileErr, mobileInput.value.length > 0 && !ok);
+                });
+            }
+
+            // Submit guard
+            if (form) {
+                form.addEventListener('submit', function (e) {
+                    let valid = true;
+
+                    const parts = nameInput ? nameInput.value.trim().split(/\s+/).filter(Boolean) : [];
+                    if (nameInput && parts.length < 2) {
+                        showErr(nameInput, nameErr, true);
+                        valid = false;
+                    }
+
+                    if (nidInput) {
+                        const v = nidInput.value.replace(/\D/g, '');
+                        if (v.length !== 14 || !/^[23]/.test(v)) {
+                            showErr(nidInput, nidErr, true);
+                            valid = false;
+                        }
+                    }
+
+                    if (mobileInput) {
+                        const v = mobileInput.value.replace(/\D/g, '');
+                        if (v.length !== 11 || !/^01[012]/.test(v)) {
+                            showErr(mobileInput, mobileErr, true);
+                            valid = false;
+                        }
+                    }
+
+                    if (!valid) {
+                        e.preventDefault();
+                        // scroll to first error
+                        const firstErr = form.querySelector('.input-invalid');
+                        if (firstErr) firstErr.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                });
+            }
         })();
     </script>
 </body>

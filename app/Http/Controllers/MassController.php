@@ -96,9 +96,14 @@ class MassController extends Controller
             'massAppointmentId' => 'required',
             'familyNumber' => 'required|digits_between:1,5',
             'familyMemberCode' => 'required|digits_between:1,2',
-            'memberName' => 'required|string|max:255',
+            'memberName' => ['required', 'string', 'max:255', function ($attribute, $value, $fail) {
+                $parts = array_filter(explode(' ', trim($value)));
+                if (count($parts) < 2) {
+                    $fail('الاسم يجب أن يتكون من جزءين على الأقل (الاسم الأول واسم العائلة)');
+                }
+            }],
             'nationalId' => ['required', 'digits:14', 'regex:/(2|3)[0-9][0-9][0-1][0-9][0-3][0-9](01|02|03|04|11|12|13|14|15|16|17|18|19|21|22|23|24|25|26|27|28|29|31|32|33|34|35|88)\d\d\d\d\d/'],
-            'mobile' => ['required', 'digits:11', 'regex:/^(01)[0-9]{9}$/'],
+            'mobile' => ['required', 'digits:11', 'regex:/^(010|011|012)[0-9]{8}$/'],
         ]);
 
         [$birthDate, $gender] = $this->extractBirthAndGender($validated['nationalId']);

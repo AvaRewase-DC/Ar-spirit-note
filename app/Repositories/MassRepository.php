@@ -16,7 +16,8 @@ class MassRepository
     public function getMassSettings(): array
     {
         try {
-            $response = Http::acceptJson()->timeout(10)->get('https://kenesty.firebaseio.com/mass-settings.json');
+            $firebaseUrl = rtrim(config('services.mass.firebase_url', 'https://kenesty.firebaseio.com'), '/');
+            $response = Http::timeout(10)->get($firebaseUrl.'/mass-settings.json');
             $data = json_decode($response->body(), true);
 
             if (is_array($data) && isset($data['massEnabled'])) {
