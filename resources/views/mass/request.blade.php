@@ -45,7 +45,7 @@
 <body>
     <div class="container">
         @if ($errors->any())
-            <div class="error">{{ $errors->first() }}</div>
+            <div class="error" id="topError">{{ $errors->has('mass') ? $errors->first('mass') : $errors->first() }}</div>
         @endif
 
         <form method="POST" action="{{ route('mass.request.store') }}">
@@ -299,7 +299,20 @@
             });
 
             @if ($errors->has('mass'))
-                showError({{ Js::from($errors->first('mass')) }});
+                try {
+                    const _msg = @json($errors->first('mass'));
+                    showError(_msg);
+                    // if this page is embedded in an iframe, notify the parent so it can show a popup there too
+                    try {
+                        if (window.self !== window.top && window.parent) {
+                            window.parent.postMessage({ type: 'massError', message: _msg }, '*');
+                        }
+                    } catch (e) {
+                        // ignore cross-origin/frame issues
+                    }
+                } catch (e) {
+                    console && console.error('Error showing mass message', e);
+                }
             @endif
         })();
     </script>
