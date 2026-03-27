@@ -57,6 +57,7 @@ class MassRepository
 
     public function newMassRequest(array $requestData)
     {
+        // dd($requestData);
         $response = Http::acceptJson()->timeout(20)->post($this->baseUrl.'requests', $requestData);
 
         return $this->decodeResponse($response->body());

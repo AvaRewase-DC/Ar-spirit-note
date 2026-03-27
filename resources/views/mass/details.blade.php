@@ -77,7 +77,6 @@
         @if ($errors->any())
             <div class="error">{{ $errors->first() }}</div>
         @endif
-
         <div class="card">
             <div class="muted">{{ $dateText }}</div>
             <h3 style="margin: 8px 0;">{{ data_get($item, 'massAppointment.title') }}</h3>
@@ -101,7 +100,7 @@
             </div>
         @endif
 
-        @if (!empty($qrSvg))
+        @if (!empty($qrSvg) && (string) data_get($item, 'status') === '2')
             <div class="card">
                 <div class="ticket">
                     <h4 class="ticket-title">تذكرة الحجز</h4>
@@ -112,6 +111,8 @@
                 </div>
             </div>
         @endif
+
+        <a href="{{ route('mass.index') }}" style="display:block; text-align:center; padding:10px 14px; border-radius:6px; border:1px solid var(--ken-primary); color:var(--ken-primary); text-decoration:none; margin-bottom:12px;">&#8592; رجوع للقائمة</a>
 
         @if ((string) data_get($item, 'status') !== '5' && !$isMassDone)
             <form id="cancel-form" action="{{ route('mass.cancel') }}" method="POST">

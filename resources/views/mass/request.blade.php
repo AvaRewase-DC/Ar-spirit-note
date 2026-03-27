@@ -51,8 +51,9 @@
         <form method="POST" action="{{ route('mass.request.store') }}">
             @csrf
 
-            <div class="card">
-                <h2 class="title">طلب حجز خدمة</h2>
+            <div class="card" style="display:flex; align-items:center; gap:12px;">
+                <a href="{{ route('mass.index') }}" style="background:var(--ken-primary); color:#fff; padding:8px 12px; border-radius:6px; text-decoration:none; font-weight:bold; box-shadow:0 2px 6px rgba(0,0,0,.08);">&larr; العودة للقائمة</a>
+                <h2 class="title" style="flex:1; text-align:center; margin:0;">طلب حجز خدمة</h2>
             </div>
 
             <div class="card">
@@ -76,9 +77,9 @@
                 <span class="label" style="color: var(--ken-primary);"> بياناتك الشخصية</span>
                 <div class="inline" dir="ltr">
                     <span>E1C1F</span>
-                    <input id="familyNumber" type="tel" maxlength="5" name="familyNumber" value="{{ old('familyNumber') }}" required autocomplete="off" placeholder="-----">
+                    <input id="familyNumber" type="tel" maxlength="5" name="familyNumber" value="{{ old('familyNumber') }}" required autocomplete="off" placeholder="-----" inputmode="numeric" pattern="[0-9]*">
                     <span>NR</span>
-                    <input id="familyMemberCode" type="tel" maxlength="2" name="familyMemberCode" value="{{ old('familyMemberCode') }}" required autocomplete="off" placeholder="--">
+                    <input id="familyMemberCode" type="tel" maxlength="2" name="familyMemberCode" value="{{ old('familyMemberCode') }}" required autocomplete="off" placeholder="--" inputmode="numeric" pattern="[0-9]*">
                     <span>رقم العضوية</span>
                 </div>
             </div>
@@ -118,7 +119,10 @@
                 <div class="field-error" id="mobileError">رقم الموبايل يجب أن يكون 11 رقم</div>
             </div>
 
-            <button class="btn" type="submit">حجز الخدمة</button>
+            <div style="display:flex; gap:10px; margin-top:4px;">
+                <a href="{{ route('mass.index') }}" style="flex:1; text-align:center; display:block; padding:10px 14px; border-radius:6px; border:1px solid var(--ken-primary); color:var(--ken-primary); text-decoration:none; box-sizing:border-box;">&#8592; رجوع</a>
+                <button class="btn" type="submit" style="flex:2;">حجز الخدمة</button>
+            </div>
         </form>
     </div>
 
@@ -167,13 +171,15 @@
 
         // ── Client-side form validation ─────────────────────────────────────
         (function () {
-            const form        = document.querySelector('form');
-            const nameInput   = document.getElementById('memberName');
-            const nidInput    = document.getElementById('nationalId');
-            const mobileInput = document.getElementById('mobileInput');
-            const nameErr     = document.getElementById('nameError');
-            const nidErr      = document.getElementById('nationalIdError');
-            const mobileErr   = document.getElementById('mobileError');
+            const form              = document.querySelector('form');
+            const nameInput         = document.getElementById('memberName');
+            const nidInput          = document.getElementById('nationalId');
+            const mobileInput       = document.getElementById('mobileInput');
+            const familyNumberInput = document.getElementById('familyNumber');
+            const memberCodeInput   = document.getElementById('familyMemberCode');
+            const nameErr           = document.getElementById('nameError');
+            const nidErr            = document.getElementById('nationalIdError');
+            const mobileErr         = document.getElementById('mobileError');
 
             function showErr(input, errEl, show) {
                 if (show) {
@@ -198,6 +204,21 @@
                     const v = nidInput.value.replace(/\D/g, '');
                     const ok = v.length === 14 && /^[23]/.test(v);
                     showErr(nidInput, nidErr, nidInput.value.length > 0 && !ok);
+                });
+            }
+
+            // enforce digits-only for family membership fields
+            if (familyNumberInput) {
+                familyNumberInput.addEventListener('input', function () {
+                    const clean = familyNumberInput.value.replace(/\D/g, '');
+                    if (clean !== familyNumberInput.value) familyNumberInput.value = clean;
+                });
+            }
+
+            if (memberCodeInput) {
+                memberCodeInput.addEventListener('input', function () {
+                    const clean = memberCodeInput.value.replace(/\D/g, '');
+                    if (clean !== memberCodeInput.value) memberCodeInput.value = clean;
                 });
             }
 
@@ -249,97 +270,38 @@
         })();
                 </script>
 
-                <!-- Popup modal for submission result -->
-                <div id="submitPopupOverlay" class="popup-overlay" aria-hidden="true">
-                    <div id="submitPopup" class="popup" role="dialog" aria-modal="true">
-                        <div class="title" id="submitPopupTitle">تم</div>
-                        <div class="msg" id="submitPopupMsg">تم إرسال الطلب بنجاح.</div>
-                        <div class="actions">
-                            <button id="submitPopupClose" class="btn">حسناً</button>
-                        </div>
-                    </div>
-                </div>
+    <!-- Popup modal for submission errors -->
+    <div id="submitPopupOverlay" class="popup-overlay" aria-hidden="true">
+        <div id="submitPopup" class="popup error" role="dialog" aria-modal="true">
+            <div class="title" id="submitPopupTitle">خطأ</div>
+            <div class="msg" id="submitPopupMsg"></div>
+            <div class="actions">
+                <button id="submitPopupClose" class="btn">حسناً</button>
+            </div>
+        </div>
+    </div>
 
-                <script>
-                    (function () {
-                        const form = document.querySelector('form');
-                        const overlay = document.getElementById('submitPopupOverlay');
-                        const popup = document.getElementById('submitPopup');
-                        const title = document.getElementById('submitPopupTitle');
-                        const msg = document.getElementById('submitPopupMsg');
-                        const closeBtn = document.getElementById('submitPopupClose');
+    <script>
+        (function () {
+            const overlay  = document.getElementById('submitPopupOverlay');
+            const msgEl    = document.getElementById('submitPopupMsg');
+            const closeBtn = document.getElementById('submitPopupClose');
 
-                        function showPopup(type, text) {
-                            popup.classList.remove('success', 'error');
-                            popup.classList.add(type);
-                            title.textContent = type === 'success' ? 'نجاح' : 'خطأ';
-                            msg.textContent = text || (type === 'success' ? 'تم إرسال الطلب بنجاح.' : 'حدث خطأ، حاول مرة أخرى.');
-                            overlay.classList.add('open');
-                            overlay.setAttribute('aria-hidden', 'false');
-                        }
+            function showError(text) {
+                msgEl.textContent = text;
+                overlay.classList.add('open');
+                overlay.setAttribute('aria-hidden', 'false');
+            }
 
-                        function hidePopup() {
-                            overlay.classList.remove('open');
-                            overlay.setAttribute('aria-hidden', 'true');
-                        }
+            closeBtn.addEventListener('click', function () {
+                overlay.classList.remove('open');
+                overlay.setAttribute('aria-hidden', 'true');
+            });
 
-                        closeBtn.addEventListener('click', hidePopup);
-
-                        if (!form) return;
-
-                        form.addEventListener('submit', function (e) {
-                            e.preventDefault();
-
-                            // Disable native submit while we do AJAX
-                            const submitBtn = form.querySelector('[type="submit"]');
-                            if (submitBtn) submitBtn.disabled = true;
-
-                            const fd = new FormData(form);
-
-                            fetch(form.action, {
-                                method: form.method || 'POST',
-                                body: fd,
-                                credentials: 'same-origin',
-                                headers: {
-                                    'X-Requested-With': 'XMLHttpRequest',
-                                    'Accept': 'application/json'
-                                }
-                            }).then(async function (res) {
-                                if (res.status === 422) {
-                                    const data = await res.json().catch(() => ({}));
-                                    // collect first validation message
-                                    const first = data?.errors ? Object.values(data.errors).flat()[0] : 'بيانات غير صحيحة.';
-                                    showPopup('error', first || 'بيانات غير صحيحة.');
-                                    if (submitBtn) submitBtn.disabled = false;
-                                    return;
-                                }
-
-                                if (!res.ok) {
-                                    // Try parse message
-                                    let text = 'حدث خطأ، حاول مرة أخرى.';
-                                    try { text = await res.text(); } catch (e) {}
-                                    showPopup('error', text);
-                                    if (submitBtn) submitBtn.disabled = false;
-                                    return;
-                                }
-
-                                // success — show success popup then redirect to response URL or reload
-                                showPopup('success', 'تم إرسال الطلب بنجاح. جارٍ التحويل...');
-                                setTimeout(function () {
-                                    // If response redirected to another page, follow it; otherwise reload
-                                    if (res.redirected && res.url) {
-                                        window.location.href = res.url;
-                                    } else {
-                                        // try to go to a done page if exists
-                                        try { window.location.href = '{{ route('mass.request.done') }}'; } catch (e) { window.location.reload(); }
-                                    }
-                                }, 900);
-                            }).catch(function (err) {
-                                showPopup('error', 'حدث خطأ في الشبكة.');
-                                if (submitBtn) submitBtn.disabled = false;
-                            });
-                        });
-                    })();
+            @if ($errors->has('mass'))
+                showError({{ Js::from($errors->first('mass')) }});
+            @endif
+        })();
     </script>
 </body>
 </html>

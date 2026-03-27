@@ -122,6 +122,7 @@ class MassController extends Controller
         ];
 
         $response = $this->massRepository->newMassRequest($payload);
+
         $statusCode = (int) $response;
 
         if ($statusCode === 1) {
