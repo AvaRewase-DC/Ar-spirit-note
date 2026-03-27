@@ -31,6 +31,15 @@
         .id-derived .field {flex:1;}
         .id-derived label {font-size: 12px; color: var(--ken-muted); display:block; margin-bottom:4px;}
         .id-derived input[type="text"] {background:#f4f4f4; color:var(--ken-text); font-size:14px; cursor:default; pointer-events:none;}
+        /* popup */
+        .popup-overlay {display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:1200; align-items:center; justify-content:center;}
+        .popup-overlay.open {display:flex;}
+        .popup {background:#fff; border-radius:8px; padding:18px 20px; max-width:420px; width:94%; box-shadow:0 8px 30px rgba(0,0,0,.25); text-align:center;}
+        .popup.success .title {color: #0a7a2f;}
+        .popup.error .title {color: #a00;}
+        .popup .msg {margin-top:8px; color:#333;}
+        .popup .actions {margin-top:14px; display:flex; gap:8px; justify-content:center}
+        .popup .btn {min-width:120px}
     </style>
 </head>
 <body>
@@ -229,15 +238,108 @@
                         }
                     }
 
-                    if (!valid) {
-                        e.preventDefault();
-                        // scroll to first error
-                        const firstErr = form.querySelector('.input-invalid');
-                        if (firstErr) firstErr.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }
+                            if (!valid) {
+                                    e.preventDefault();
+                                    // scroll to first error
+                                    const firstErr = form.querySelector('.input-invalid');
+                                    if (firstErr) firstErr.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                }
                 });
             }
         })();
+                </script>
+
+                <!-- Popup modal for submission result -->
+                <div id="submitPopupOverlay" class="popup-overlay" aria-hidden="true">
+                    <div id="submitPopup" class="popup" role="dialog" aria-modal="true">
+                        <div class="title" id="submitPopupTitle">تم</div>
+                        <div class="msg" id="submitPopupMsg">تم إرسال الطلب بنجاح.</div>
+                        <div class="actions">
+                            <button id="submitPopupClose" class="btn">حسناً</button>
+                        </div>
+                    </div>
+                </div>
+
+                <script>
+                    (function () {
+                        const form = document.querySelector('form');
+                        const overlay = document.getElementById('submitPopupOverlay');
+                        const popup = document.getElementById('submitPopup');
+                        const title = document.getElementById('submitPopupTitle');
+                        const msg = document.getElementById('submitPopupMsg');
+                        const closeBtn = document.getElementById('submitPopupClose');
+
+                        function showPopup(type, text) {
+                            popup.classList.remove('success', 'error');
+                            popup.classList.add(type);
+                            title.textContent = type === 'success' ? 'نجاح' : 'خطأ';
+                            msg.textContent = text || (type === 'success' ? 'تم إرسال الطلب بنجاح.' : 'حدث خطأ، حاول مرة أخرى.');
+                            overlay.classList.add('open');
+                            overlay.setAttribute('aria-hidden', 'false');
+                        }
+
+                        function hidePopup() {
+                            overlay.classList.remove('open');
+                            overlay.setAttribute('aria-hidden', 'true');
+                        }
+
+                        closeBtn.addEventListener('click', hidePopup);
+
+                        if (!form) return;
+
+                        form.addEventListener('submit', function (e) {
+                            e.preventDefault();
+
+                            // Disable native submit while we do AJAX
+                            const submitBtn = form.querySelector('[type="submit"]');
+                            if (submitBtn) submitBtn.disabled = true;
+
+                            const fd = new FormData(form);
+
+                            fetch(form.action, {
+                                method: form.method || 'POST',
+                                body: fd,
+                                credentials: 'same-origin',
+                                headers: {
+                                    'X-Requested-With': 'XMLHttpRequest',
+                                    'Accept': 'application/json'
+                                }
+                            }).then(async function (res) {
+                                if (res.status === 422) {
+                                    const data = await res.json().catch(() => ({}));
+                                    // collect first validation message
+                                    const first = data?.errors ? Object.values(data.errors).flat()[0] : 'بيانات غير صحيحة.';
+                                    showPopup('error', first || 'بيانات غير صحيحة.');
+                                    if (submitBtn) submitBtn.disabled = false;
+                                    return;
+                                }
+
+                                if (!res.ok) {
+                                    // Try parse message
+                                    let text = 'حدث خطأ، حاول مرة أخرى.';
+                                    try { text = await res.text(); } catch (e) {}
+                                    showPopup('error', text);
+                                    if (submitBtn) submitBtn.disabled = false;
+                                    return;
+                                }
+
+                                // success — show success popup then redirect to response URL or reload
+                                showPopup('success', 'تم إرسال الطلب بنجاح. جارٍ التحويل...');
+                                setTimeout(function () {
+                                    // If response redirected to another page, follow it; otherwise reload
+                                    if (res.redirected && res.url) {
+                                        window.location.href = res.url;
+                                    } else {
+                                        // try to go to a done page if exists
+                                        try { window.location.href = '{{ route('mass.request.done') }}'; } catch (e) { window.location.reload(); }
+                                    }
+                                }, 900);
+                            }).catch(function (err) {
+                                showPopup('error', 'حدث خطأ في الشبكة.');
+                                if (submitBtn) submitBtn.disabled = false;
+                            });
+                        });
+                    })();
     </script>
 </body>
 </html>
